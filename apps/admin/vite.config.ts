@@ -14,6 +14,8 @@ export default defineConfig({
     host: true,
     port: Number(process.env.ADMIN_PORT ?? 4174),
     strictPort: true,
+    // Hosts de la red de Docker (capturas y tests desde otros contenedores).
+    allowedHosts: ['localhost', 'web', 'admin', 'host.docker.internal'],
     proxy: { '/api': apiTarget, '/media': apiTarget },
   },
 });
