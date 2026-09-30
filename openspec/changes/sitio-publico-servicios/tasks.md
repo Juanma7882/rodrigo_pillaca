@@ -4,23 +4,23 @@
 
 ## 1. Modelo de contenido y esquemas
 
-- [ ] 1.1 Agregar a Prisma los modelos `SiteSettings`, `MediaAsset`, `Service`, `ServiceImage`, `Project`, `ProjectImage`, `ProcessStep` y `Faq` (D1), crear la migración y verificar que `prisma migrate dev` aplica sin errores
-- [ ] 1.2 Definir en `@tamila/shared` los esquemas Zod de las respuestas públicas (`siteContent`, `serviceSummary`, `serviceDetail`, `project`, `mediaAsset`) y verificar con tests Vitest de casos válidos e inválidos
+- [x] 1.1 Agregar a Prisma los modelos `SiteSettings`, `MediaAsset`, `Service`, `ServiceImage`, `Project`, `ProjectImage`, `ProcessStep` y `Faq` (D1), crear la migración y verificar que `prisma migrate dev` aplica sin errores
+- [x] 1.2 Definir en `@tamila/shared` los esquemas Zod de las respuestas públicas (`siteContent`, `serviceSummary`, `serviceDetail`, `project`, `mediaAsset`) y verificar con tests Vitest de casos válidos e inválidos
 
 ## 2. Medios
 
-- [ ] 2.1 Implementar en `apps/api/src/media` la función que genera variantes AVIF/WebP 480/960/1600 con `sharp`, nombres con hash y el `MediaAsset` correspondiente, y verificar con un test unitario que genera 6 archivos y registra dimensiones correctas
-- [ ] 2.2 Servir `/media/*` en dev con `@nestjs/serve-static` y en prod desde Caddy con caché inmutable, con un volumen `media` en ambos compose, y verificar que una imagen sigue disponible después de `docker compose up -d --force-recreate`
+- [x] 2.1 Implementar en `apps/api/src/media` la función que genera variantes AVIF/WebP 480/960/1600 con `sharp`, nombres con hash y el `MediaAsset` correspondiente, y verificar con un test unitario que genera 6 archivos y registra dimensiones correctas
+- [x] 2.2 Servir `/media/*` en dev con `@nestjs/serve-static` y en prod desde Caddy con caché inmutable, con un volumen `media` en ambos compose, y verificar que una imagen sigue disponible después de `docker compose up -d --force-recreate`
 
 ## 3. Seed de contenido
 
-- [ ] 3.1 Seleccionar y guardar en `apps/api/prisma/seed-media/` imágenes de licencia libre (3 por servicio + hero/OG + trabajos de ejemplo) con `CREDITS.md`, y verificar que cada archivo tiene su crédito listado
-- [ ] 3.2 Escribir el seed idempotente `seed:content` (configuración, 5 pasos, 6 preguntas, 8 servicios con textos e imágenes; trabajos de ejemplo solo si `SEED_SAMPLE_PROJECTS=true`) y verificar que ejecutarlo dos veces deja 8 servicios y ninguno de aire acondicionado
+- [x] 3.1 Seleccionar y guardar en `apps/api/prisma/seed-media/` imágenes de licencia libre (3 por servicio + hero/OG + trabajos de ejemplo) con `CREDITS.md`, y verificar que cada archivo tiene su crédito listado
+- [x] 3.2 Escribir el seed idempotente `seed:content` (configuración, 5 pasos, 6 preguntas, 8 servicios con textos e imágenes; trabajos de ejemplo solo si `SEED_SAMPLE_PROJECTS=true`) y verificar que ejecutarlo dos veces deja 8 servicios y ninguno de aire acondicionado
 
 ## 4. API pública
 
-- [ ] 4.1 Implementar `PublicContentModule` con `GET /api/public/site`, `/services`, `/services/:slug` y `/projects` (solo publicados, ordenados, con headers de caché), y verificar con tests e2e: 200 con el contenido, 404 para un slug no publicado, y 404/405 para POST
-- [ ] 4.2 Documentar los endpoints en Swagger y verificar que aparecen en `/api/docs` en dev
+- [x] 4.1 Implementar `PublicContentModule` con `GET /api/public/site`, `/services`, `/services/:slug` y `/projects` (solo publicados, ordenados, con headers de caché), y verificar con tests e2e: 200 con el contenido, 404 para un slug no publicado, y 404/405 para POST
+- [x] 4.2 Documentar los endpoints en Swagger y verificar que aparecen en `/api/docs` en dev
 
 ## 5. Base editorial en `packages/ui` y web
 
