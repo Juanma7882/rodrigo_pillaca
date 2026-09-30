@@ -1,0 +1,153 @@
+# TAMILA
+
+Sitio público de servicios de construcción y reformas, con panel de administración.
+
+| App               | Stack                                                  | Dev                                             |
+| ----------------- | ------------------------------------------------------ | ----------------------------------------------- |
+| `apps/web`        | Sitio público: React Router (SSR) + Vite + Tailwind    | http://localhost:4173                           |
+| `apps/admin`      | Panel de administración (SPA): React + Vite + Tailwind | http://localhost:4174                           |
+| `apps/api`        | API REST: NestJS + Prisma + PostgreSQL                 | http://localhost:3000/api · docs en `/api/docs` |
+| `packages/shared` | Esquemas Zod y tipos compartidos                       |                                                 |
+| `packages/ui`     | Tema (paleta, modo claro/oscuro) y componentes base    |                                                 |
+| `packages/config` | ESLint, Prettier y tsconfig compartidos                |                                                 |
+| `e2e`             | Tests end-to-end con Playwright                        |                                                 |
+
+## Requisitos
+
+- Node 24 (`nvm use`) y pnpm 12 (`corepack enable`)
+- Docker con Compose v2 (`docker compose version`)
+
+## Primer arranque
+
+```bash
+pnpm install              # dependencias + hooks de git (husky)
+cp .env.example .env      # completar valores si hace falta
+pnpm dev:up               # postgres + api + web + admin con recarga automática
+pnpm dev:logs             # ver logs
+```
+
+La primera vez, crear el administrador:
+
+```bash
+docker compose --env-file .env -f docker/compose.dev.yml exec api pnpm --filter @tamila/api seed:admin
+```
+
+Se usan `ADMIN_EMAIL` y `ADMIN_PASSWORD` del `.env`. El login de desarrollo usa las claves de prueba de Cloudflare Turnstile, que siempre pasan.
+
+Para apagar todo: `pnpm dev:down`.
+
+### Puertos
+
+| Servicio | Puerto | Nota                           |
+| -------- | ------ | ------------------------------ |
+| web      | 4173   |                                |
+| admin    | 4174   |                                |
+| api      | 3000   |                                |
+| postgres | 5435   | Bases `tamila` y `tamila_test` |
+
+Los puertos por defecto de Vite (5173/5174) no se usan porque en Windows + WSL suelen caer en rangos reservados por Hyper-V (`netsh interface ipv4 show excludedportrange protocol=tcp`).
+
+## Comandos
+
+```bash
+pnpm lint          # ESLint en todo el monorepo
+pnpm typecheck     # TypeScript
+pnpm test          # tests unitarios (Vitest en frontends, Jest en la API)
+pnpm build         # build de todo
+pnpm test:e2e      # e2e: API (Jest + Supertest) y navegador (Playwright)
+pnpm format        # Prettier
+```
+
+Base de datos (desde `apps/api`, con Postgres levantado):
+
+```bash
+pnpm db:migrate    # crea y aplica una migración nueva (prisma migrate dev)
+pnpm db:deploy     # aplica migraciones pendientes
+```
+
+## Convenciones
+
+- **Flujo de trabajo:** los cambios se planifican con OpenSpec (`openspec/`). Ver `CLAUDE.md`.
+- **Estructura por features:**
+  - `src/features/<feature>/` en admin y `app/features/<feature>/` en web.
+  - Un feature solo importa el `index.ts` de otro feature; lo controla ESLint (`tamila/feature-boundaries`).
+  - La capa de rutas puede cargar `pages/` de un feature de forma diferida.
+- **Lazy loading:** cada ruta es un chunk propio, y los componentes pesados usan `React.lazy`.
+- **Tema:**
+  - Los tokens están en `packages/ui/src/theme.css`.
+  - Sobre amarillo siempre va texto oscuro, y nunca hay texto amarillo sobre blanco (en modo claro se usa `brand-text`).
+  - Un test verifica el contraste WCAG AA.
+- **Validación:** los esquemas Zod de `@tamila/shared` se usan en el frontend (React Hook Form) y en la API (`ZodValidationPipe`).
+- **Commits:** Conventional Commits (`feat: …`, `fix: …`). Husky corre lint-staged y commitlint.
+- **Ramas:** `main` = producción, `develop` = desarrollo. Todo entra por PR con CI en verde.
+
+## Despliegue (VPS)
+
+Cada push a `main` ejecuta `.github/workflows/deploy.yml`:
+
+1. Construye las imágenes `api`, `web` y `caddy` y las publica en GHCR con el SHA del commit.
+2. Copia `docker/compose.prod.yml` a la VPS.
+3. Por SSH descarga las imágenes y ejecuta las migraciones (si fallan, se aborta y sigue la versión anterior).
+4. Levanta la nueva versión y espera a que `/api/health` responda.
+
+**Rollback:** re-ejecutar el workflow de un commit anterior (Actions → Deploy → Run workflow) o, en la VPS:
+
+```bash
+IMAGE_PREFIX=ghcr.io/juanma7882/rodrigo_pillaca IMAGE_TAG=<sha-anterior> docker compose -f compose.prod.yml up -d --no-build
+```
+
+### 1. Preparar la VPS (una sola vez)
+
+- Instalar Docker Engine + Compose v2.
+- Crear un usuario de deploy con acceso por clave SSH y agregarlo al grupo `docker`.
+- Apuntar el DNS de `SITE_DOMAIN` y `ADMIN_DOMAIN` a la VPS. Caddy obtiene los certificados HTTPS solo.
+  - Si se usa el proxy de Cloudflare (nube naranja), configurar SSL en modo _Full (strict)_.
+- Abrir los puertos 80 y 443.
+- Crear el directorio de la app (por defecto `~/tamila`) con un `.env` de producción basado en `.env.example`:
+
+| Variable                                                                                       | Valor en producción                                                            |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`                                            | Credenciales de la base (clave larga y aleatoria)                              |
+| `DATABASE_URL`                                                                                 | La arma compose automáticamente: no hace falta                                 |
+| `JWT_ACCESS_SECRET`                                                                            | `openssl rand -base64 48`                                                      |
+| `JWT_ACCESS_TTL_SECONDS`, `REFRESH_TOKEN_TTL_DAYS`                                             | `900` y `7`                                                                    |
+| `TURNSTILE_SECRET_KEY`                                                                         | Secret key real de Cloudflare Turnstile                                        |
+| `VITE_TURNSTILE_SITE_KEY`                                                                      | No se usa en la VPS: va como variable de GitHub (`TURNSTILE_SITE_KEY`)         |
+| `CORS_ORIGINS`                                                                                 | `https://<SITE_DOMAIN>,https://<ADMIN_DOMAIN>`                                 |
+| `TRUST_PROXY_HOPS`                                                                             | `1` (Caddy)                                                                    |
+| `LOG_LEVEL`                                                                                    | `info`                                                                         |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD`                                                                | Administrador inicial (solo para el seed)                                      |
+| `SITE_DOMAIN`, `ADMIN_DOMAIN`                                                                  | Dominios reales, sin `http://` (p. ej. `tamila.com.ar`, `admin.tamila.com.ar`) |
+| `HTTP_PORT`, `HTTPS_PORT`                                                                      | `80` y `443`                                                                   |
+| `API_PORT`, `WEB_PORT`, `ADMIN_PORT`, `POSTGRES_PORT`, `DATABASE_URL_TEST`, `API_INTERNAL_URL` | Solo desarrollo: no hacen falta                                                |
+
+`IMAGE_PREFIX` e `IMAGE_TAG` no van en el `.env`: los define el workflow de deploy en cada despliegue.
+
+Después del primer despliegue, crear el administrador:
+
+```bash
+docker compose -f compose.prod.yml run --rm api node dist/src/scripts/seed-admin
+```
+
+### 2. Configurar GitHub (una sola vez)
+
+En **Settings → Secrets and variables → Actions**, dentro del environment `production`:
+
+| Tipo     | Nombre               | Valor                                                   |
+| -------- | -------------------- | ------------------------------------------------------- |
+| Secret   | `VPS_HOST`           | IP o dominio de la VPS                                  |
+| Secret   | `VPS_USER`           | Usuario de deploy                                       |
+| Secret   | `VPS_SSH_KEY`        | Clave privada SSH del usuario de deploy                 |
+| Secret   | `VPS_PORT`           | Puerto SSH (opcional, por defecto 22)                   |
+| Variable | `TURNSTILE_SITE_KEY` | Site key real de Turnstile (pública, va en el admin)    |
+| Variable | `VPS_APP_DIR`        | Directorio de la app (opcional, por defecto `~/tamila`) |
+
+Los secretos de la aplicación (JWT, base de datos, Turnstile secret) viven solo en el `.env` de la VPS, nunca en el repositorio ni en GitHub.
+
+### 3. Proteger las ramas
+
+En **Settings → Branches**, agregar reglas para `main` y `develop`:
+
+- _Require a pull request before merging_.
+- _Require status checks to pass_: `Lint, tipos, tests y build` y `Tests end-to-end`.
+- _Do not allow bypassing the above settings_.
