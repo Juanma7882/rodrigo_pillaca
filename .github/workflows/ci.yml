@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Valores de prueba: nunca son secretos reales.
+  DATABASE_URL: postgresql://tamila:tamila@localhost:5432/tamila_test?schema=public
+  DATABASE_URL_TEST: postgresql://tamila:tamila@localhost:5432/tamila_test?schema=public
+  CORS_ORIGINS: http://localhost:4173,http://localhost:4174
+  JWT_ACCESS_SECRET: ci-secreto-de-pruebas-de-al-menos-32-caracteres
+  TURNSTILE_SECRET_KEY: 1x0000000000000000000000000000000AA
+  VITE_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+  ADMIN_EMAIL: admin@tamila.test
+  ADMIN_PASSWORD: clave-de-ci-segura-123
+
+jobs:
+  quality:
+    name: Lint, tipos, tests y build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm turbo run lint typecheck test build
+
+  e2e:
+    name: Tests end-to-end
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: tamila
+          POSTGRES_PASSWORD: tamila
+          POSTGRES_DB: tamila_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U tamila -d tamila_test"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build --filter=@tamila/api --filter=@tamila/web --filter=@tamila/admin
+
+      - name: E2E de la API (Jest + Supertest)
+        run: pnpm --filter @tamila/api test:e2e
+
+      - name: Levantar el stack para Playwright
+        run: |
+          pnpm --filter @tamila/api exec prisma migrate deploy
+          pnpm --filter @tamila/api seed:admin
+          (cd apps/api && NODE_ENV=production node dist/src/main > ../../api.log 2>&1 &)
+          (cd apps/web && PORT=4173 pnpm start > ../../web.log 2>&1 &)
+          (cd apps/admin && pnpm exec vite preview --port 4174 --strictPort > ../../admin.log 2>&1 &)
+          npx --yes wait-on@8 -t 60000 http://localhost:3000/api/health http://localhost:4173 http://localhost:4174
+
+      - name: Instalar Chromium
+        run: pnpm --filter @tamila/e2e exec playwright install --with-deps chromium
+
+      - name: E2E en el navegador (Playwright)
+        run: pnpm --filter @tamila/e2e test:e2e
+
+      - name: Logs del stack
+        if: failure()
+        run: tail -n 100 api.log web.log admin.log
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: e2e/playwright-report
+          retention-days: 7
