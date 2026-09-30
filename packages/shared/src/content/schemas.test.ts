@@ -76,6 +76,7 @@ describe('esquemas de contenido público', () => {
       services: [{ slug: 'durlock', name: 'Durlock' }],
       processSteps: [{ order: 1, title: 'Contacto', description: 'Nos escribís.' }],
       faqs: [{ id: 'f1', question: '¿Cobran el presupuesto?', answer: 'No.' }],
+      hasProjects: false,
     });
     expect(result.success).toBe(true);
   });

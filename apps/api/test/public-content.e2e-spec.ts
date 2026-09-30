@@ -115,6 +115,7 @@ describe('Contenido público (e2e)', () => {
       { slug: 'durlock', name: 'Durlock' },
       { slug: 'pintura', name: 'Pintura' },
     ]);
+    expect(body.hasProjects).toBe(true);
     expect(res.headers['cache-control']).toBe('public, max-age=60, stale-while-revalidate=300');
   });
 

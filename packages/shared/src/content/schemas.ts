@@ -55,6 +55,8 @@ export const siteContentSchema = z.object({
   services: z.array(serviceLinkSchema),
   processSteps: z.array(processStepSchema),
   faqs: z.array(faqSchema),
+  /** Si hay trabajos publicados (la sección y su enlace se ocultan si no hay). */
+  hasProjects: z.boolean(),
 });
 export type SiteContent = z.infer<typeof siteContentSchema>;
 
