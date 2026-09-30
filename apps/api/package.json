@@ -13,13 +13,15 @@
     "prisma:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
-    "seed:admin": "node dist/src/scripts/seed-admin"
+    "seed:admin": "node dist/src/scripts/seed-admin",
+    "seed:content": "node dist/src/scripts/seed-content"
   },
   "dependencies": {
     "@nestjs/common": "^12.1.1",
     "@nestjs/core": "^12.1.1",
     "@nestjs/jwt": "^12.0.2",
     "@nestjs/platform-express": "^12.1.1",
+    "@nestjs/serve-static": "^12.0.0",
     "@nestjs/swagger": "^12.0.2",
     "@nestjs/terminus": "^12.1.0",
     "@nestjs/throttler": "^6.7.1",
@@ -35,6 +37,7 @@
     "prisma": "7.10.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "sharp": "^0.35.5",
     "zod": "^4.6.5"
   },
   "devDependencies": {

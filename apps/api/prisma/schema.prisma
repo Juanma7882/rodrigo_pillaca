@@ -36,3 +36,143 @@ model RefreshToken {
   @@index([familyId])
   @@map("refresh_tokens")
 }
+
+// ─── Contenido del sitio público ─────────────────────────────────────────────
+
+/// Configuración general del sitio (fila única, id = 1).
+model SiteSettings {
+  id                     Int         @id @default(1)
+  heroTitle              String
+  heroSubtitle           String
+  /// Formato internacional sin "+" (ej. 5491122334455). Vacío = no se muestran botones de WhatsApp.
+  whatsappNumber         String      @default("")
+  whatsappDefaultMessage String
+  instagramUrl           String?
+  facebookUrl            String?
+  tiktokUrl              String?
+  businessHours          String?
+  footerText             String?
+  seoTitle               String
+  seoDescription         String
+  ogImageId              String?
+  ogImage                MediaAsset? @relation("SiteOgImage", fields: [ogImageId], references: [id], onDelete: SetNull)
+  updatedAt              DateTime    @updatedAt
+
+  @@map("site_settings")
+}
+
+/// Imagen subida con sus variantes responsive (AVIF/WebP en varios anchos).
+model MediaAsset {
+  id            String         @id @default(uuid())
+  /// Hash del contenido original: evita duplicados y da nombres de archivo inmutables.
+  hash          String         @unique
+  path          String
+  alt           String
+  width         Int
+  height        Int
+  /// [{ width, avif, webp }] con rutas públicas bajo /media.
+  variants      Json
+  /// Crédito de la foto (fotos de muestra de licencia libre).
+  credit        String?
+  createdAt     DateTime       @default(now())
+  siteOgImage   SiteSettings[] @relation("SiteOgImage")
+  serviceCovers Service[]      @relation("ServiceCover")
+  serviceImages ServiceImage[]
+  projectBefore Project[]      @relation("ProjectBefore")
+  projectAfter  Project[]      @relation("ProjectAfter")
+  projectImages ProjectImage[]
+
+  @@map("media_assets")
+}
+
+model Service {
+  id                String         @id @default(uuid())
+  slug              String         @unique
+  name              String
+  /// El número de capítulo (01, 02…) se calcula del orden de los publicados; no se guarda.
+  order             Int
+  published         Boolean        @default(true)
+  tagline           String
+  summary           String
+  description       String
+  includes          String[]
+  seoTitle          String?
+  seoDescription    String?
+  coverImageId      String?
+  coverImage        MediaAsset?    @relation("ServiceCover", fields: [coverImageId], references: [id], onDelete: SetNull)
+  images            ServiceImage[]
+  featuredProjectId String?        @unique
+  featuredProject   Project?       @relation("FeaturedProject", fields: [featuredProjectId], references: [id], onDelete: SetNull)
+  projects          Project[]      @relation("ServiceProjects")
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([published, order])
+  @@map("services")
+}
+
+model ServiceImage {
+  serviceId String
+  mediaId   String
+  order     Int
+  service   Service    @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@id([serviceId, mediaId])
+  @@map("service_images")
+}
+
+/// Trabajo realizado.
+model Project {
+  id            String         @id @default(uuid())
+  title         String
+  year          Int?
+  location      String?
+  description   String
+  order         Int
+  published     Boolean        @default(true)
+  serviceId     String
+  service       Service        @relation("ServiceProjects", fields: [serviceId], references: [id], onDelete: Cascade)
+  beforeImageId String?
+  beforeImage   MediaAsset?    @relation("ProjectBefore", fields: [beforeImageId], references: [id], onDelete: SetNull)
+  afterImageId  String?
+  afterImage    MediaAsset?    @relation("ProjectAfter", fields: [afterImageId], references: [id], onDelete: SetNull)
+  images        ProjectImage[]
+  featuredIn    Service?       @relation("FeaturedProject")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([published, order])
+  @@map("projects")
+}
+
+model ProjectImage {
+  projectId String
+  mediaId   String
+  order     Int
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, mediaId])
+  @@map("project_images")
+}
+
+/// Paso de "Cómo trabajamos".
+model ProcessStep {
+  id          String @id @default(uuid())
+  order       Int    @unique
+  title       String
+  description String
+
+  @@map("process_steps")
+}
+
+model Faq {
+  id        String  @id @default(uuid())
+  order     Int     @unique
+  question  String
+  answer    String
+  published Boolean @default(true)
+
+  @@map("faqs")
+}

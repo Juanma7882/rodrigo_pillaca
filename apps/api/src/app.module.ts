@@ -4,7 +4,9 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from './config/config.module';
 import { ENV, type Env } from './config/env';
 import { HealthModule } from './health/health.module';
+import { MediaModule } from './media/media.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { PublicContentModule } from './public-content/public-content.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { PrismaModule } from './prisma/prisma.module';
     PrismaModule,
     HealthModule,
     AuthModule,
+    MediaModule,
+    PublicContentModule,
   ],
 })
 export class AppModule {}

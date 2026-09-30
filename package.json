@@ -18,7 +18,8 @@
     "dev:up": "docker compose --env-file .env -f docker/compose.dev.yml up -d --build",
     "dev:down": "docker compose --env-file .env -f docker/compose.dev.yml down",
     "dev:logs": "docker compose --env-file .env -f docker/compose.dev.yml logs -f --tail=100",
-    "dev:ps": "docker compose --env-file .env -f docker/compose.dev.yml ps"
+    "dev:ps": "docker compose --env-file .env -f docker/compose.dev.yml ps",
+    "dev:install": "docker compose --env-file .env -f docker/compose.dev.yml run --rm install && docker compose --env-file .env -f docker/compose.dev.yml restart api web admin shared"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
