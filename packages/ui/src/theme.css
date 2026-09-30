@@ -57,6 +57,10 @@
 }
 
 @theme {
+  /* Tipografías: Inter para texto, Montserrat pesada para títulos y números */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Montserrat', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
   /* Escala de marca (amarillo del logo) */
   --color-brand-50: #fffae6;
   --color-brand-100: #fff1bf;

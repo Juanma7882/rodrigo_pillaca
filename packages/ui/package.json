@@ -11,7 +11,8 @@
       "default": "./vite-plugin.js"
     },
     "./components/*": "./src/components/ui/*.tsx",
-    "./lib/*": "./src/lib/*.ts"
+    "./lib/*": "./src/lib/*.ts",
+    "./fonts.css": "./src/fonts.css"
   },
   "scripts": {
     "lint": "eslint .",
@@ -23,6 +24,8 @@
     "react-dom": "^19"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/montserrat": "^5.3.0",
     "@marsidev/react-turnstile": "^1.6.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
