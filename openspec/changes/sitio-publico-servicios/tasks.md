@@ -45,6 +45,7 @@
 - [x] 7.7 Implementar `FaqAccordion` accesible (`aria-expanded`, teclado) y verificar con un test
 - [x] 7.8 Agregar las animaciones de entrada con `IntersectionObserver`, desactivadas con `prefers-reduced-motion` (sin `content-visibility`: rompía la navegación a secciones, ver design), y verificar que con movimiento reducido no hay transiciones
 - [x] 7.9 Agregar la foto de fondo del hero (`SiteSettings.heroImageId`, migración, esquema, API, seed con una foto de licencia libre y su crédito) con capa oscura y texto blanco, y verificar con un test que sin foto no se renderiza la imagen y con foto se carga con prioridad
+- [x] 7.10 Hacer la navbar fija y siempre visible (superpuesta, sin empujar el contenido) y convertir el menú móvil en un modal con fondo oscurecido que se cierra al tocarlo, y verificar con tests Vitest y E2E que la barra sigue visible al hacer scroll y que el modal no desplaza la página
 
 ## 8. Página por servicio
 

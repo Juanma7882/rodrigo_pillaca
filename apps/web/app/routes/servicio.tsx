@@ -30,7 +30,8 @@ export default function ServicioPage() {
   const { service } = useLoaderData<typeof loader>();
   const root = useRouteLoaderData<typeof rootLoader>('root');
   return (
-    <>
+    // La barra fija se superpone: se deja libre su altura.
+    <div className="pt-16">
       <ServiceChapter
         service={service}
         whatsappNumber={root?.site.settings.whatsappNumber ?? ''}
@@ -38,7 +39,7 @@ export default function ServicioPage() {
       />
       <ProjectsGallery projects={service.projects} />
       <ServicePager previous={service.previous} next={service.next} />
-    </>
+    </div>
   );
 }
 

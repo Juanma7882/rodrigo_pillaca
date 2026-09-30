@@ -14,7 +14,8 @@ export function Hero({ settings }: { settings: SiteSettings }) {
     <section
       aria-labelledby="hero-titulo"
       className={cn(
-        'relative isolate flex min-h-[calc(100svh-4rem)] flex-col',
+        // La barra fija se superpone: la portada arranca detrás y deja libre su altura.
+        'relative isolate flex min-h-svh flex-col pt-16',
         image && 'dark bg-background text-foreground',
       )}
     >

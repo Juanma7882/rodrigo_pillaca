@@ -7,7 +7,7 @@ Da al sitio público una barra de navegación y un footer comunes que orientan a
 ## ADDED Requirements
 
 ### Requirement: Barra de navegación
-Todas las páginas del sitio SHALL mostrar una barra de navegación con el logo (que lleva al inicio), enlaces a las secciones principales (Servicios, Cómo trabajamos, Trabajos, Preguntas), el selector de modo claro/oscuro y un botón de WhatsApp. La barra MUST permanecer accesible al hacer scroll.
+Todas las páginas del sitio SHALL mostrar una barra de navegación con el logo (que lleva al inicio), enlaces a las secciones principales (Servicios, Cómo trabajamos, Trabajos, Preguntas), el selector de modo claro/oscuro y un botón de WhatsApp. La barra MUST quedar fija arriba y visible en todo momento, en escritorio y en celulares, superpuesta al contenido sin ocupar espacio propio en el flujo de la página.
 
 #### Scenario: Enlace a una sección desde el inicio
 - **WHEN** el usuario está en el inicio y hace clic en "Cómo trabajamos"
@@ -18,11 +18,15 @@ Todas las páginas del sitio SHALL mostrar una barra de navegación con el logo 
 - **THEN** navega al inicio y queda posicionado en la sección de preguntas frecuentes
 
 #### Scenario: Scroll largo
-- **WHEN** el usuario hace scroll hasta la mitad de la página
-- **THEN** la barra de navegación sigue visible o reaparece al hacer scroll hacia arriba
+- **WHEN** el usuario hace scroll hacia abajo o hacia arriba en cualquier punto de la página
+- **THEN** la barra de navegación sigue visible arriba
+
+#### Scenario: La barra no desplaza el contenido
+- **WHEN** se carga el inicio
+- **THEN** la portada empieza detrás de la barra, sin franja reservada, y ningún texto queda tapado por ella
 
 ### Requirement: Navegación en celulares
-En pantallas angostas la barra SHALL mostrar un botón de menú que abre un panel con los mismos enlaces. El panel MUST cerrarse al elegir un enlace o al presionar Escape, y MUST ser operable con teclado.
+En pantallas angostas la barra SHALL mostrar un botón de menú que abre un modal con los mismos enlaces, superpuesto a la página con un fondo oscurecido y sin desplazar el contenido. El modal MUST cerrarse al elegir un enlace, al presionar Escape o al tocar el fondo, y MUST ser operable con teclado.
 
 #### Scenario: Menú móvil
 - **WHEN** en un celular el usuario abre el menú y elige "Servicios"

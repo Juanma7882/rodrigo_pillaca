@@ -47,6 +47,16 @@ test('la navbar lleva a las secciones del inicio', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Cómo trabajamos' })).toBeInViewport();
 });
 
+test('la navbar queda fija y visible al hacer scroll', async ({ page }) => {
+  await gotoHydrated(page, '/');
+  const header = page.getByRole('banner');
+  for (const y of [1500, 6000, 800]) {
+    await page.evaluate((top) => window.scrollTo(0, top), y);
+    await expect(header).toBeInViewport();
+    expect((await header.boundingBox())?.y).toBe(0);
+  }
+});
+
 test('desde otra página, "Preguntas" vuelve al inicio en esa sección', async ({ page }) => {
   await gotoHydrated(page, '/servicios/durlock');
   await page
@@ -67,6 +77,22 @@ test.describe('en el celular', () => {
     await menu.getByRole('link', { name: /Servicios/ }).click();
     await expect(menu).toBeHidden();
     await expect(page.getByRole('heading', { name: 'Contenido' })).toBeInViewport();
+  });
+
+  test('el menú se abre como modal sin desplazar la página y se cierra tocando el fondo', async ({
+    page,
+  }) => {
+    await gotoHydrated(page, '/');
+    await page.evaluate(() => window.scrollTo(0, 1200));
+    const heading = page.getByRole('heading', { name: 'Contenido' });
+    const before = await heading.boundingBox();
+    await page.getByRole('button', { name: 'Abrir menú' }).click();
+    await expect(page.getByRole('dialog', { name: 'Menú' })).toBeVisible();
+    expect(await heading.boundingBox()).toEqual(before);
+    expect(await page.evaluate(() => window.scrollY)).toBe(1200);
+    // Toque en la franja de fondo visible a la izquierda del panel (el body tiene el scroll bloqueado).
+    await page.mouse.click(10, 400);
+    await expect(page.getByRole('dialog', { name: 'Menú' })).toBeHidden();
   });
 
   test('no hay scroll horizontal', async ({ page }) => {

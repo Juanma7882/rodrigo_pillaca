@@ -1,36 +1,43 @@
+import { Logo } from '@tamila/ui';
 import { Menu, X } from 'lucide-react';
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import type { NavItem } from './nav-items';
+import { createPortal } from 'react-dom';
 import { twoDigits } from '~/shared/format';
+import type { NavItem } from './nav-items';
 import { SectionLink } from './SectionLink';
 
-type MobileMenuProps = { items: NavItem[]; onOpenChange?: (open: boolean) => void };
-
-/** Menú de navegación para pantallas angostas: foco atrapado, cierre con Escape o al elegir. */
-export function MobileMenu({ items, onOpenChange }: MobileMenuProps) {
+/**
+ * Menú para pantallas angostas: modal con panel lateral sobre un fondo oscurecido.
+ * No desplaza la página; se cierra al elegir, con Escape o tocando el fondo. Foco atrapado.
+ */
+export function MobileMenu({ items }: { items: NavItem[] }) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const toggle = (next: boolean) => {
-    setOpen(next);
-    onOpenChange?.(next);
-    if (!next) buttonRef.current?.focus();
+  const close = () => {
+    setOpen(false);
+    buttonRef.current?.focus();
   };
 
   useEffect(() => {
     if (!open) return;
     panelRef.current?.querySelector<HTMLElement>('a')?.focus();
+    // Bloquea el scroll de fondo sin cambiar el ancho (evita el salto por la barra de scroll).
+    const { overflow, paddingRight } = document.body.style;
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = 'hidden';
+    if (scrollbar > 0) document.body.style.paddingRight = `${scrollbar}px`;
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = overflow;
+      document.body.style.paddingRight = paddingRight;
     };
   }, [open]);
 
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
       event.preventDefault();
-      toggle(false);
+      close();
       return;
     }
     if (event.key !== 'Tab') return;
@@ -54,47 +61,63 @@ export function MobileMenu({ items, onOpenChange }: MobileMenuProps) {
         type="button"
         aria-expanded={open}
         aria-controls="menu-movil"
-        aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
-        onClick={() => toggle(!open)}
+        aria-label="Abrir menú"
+        onClick={() => setOpen(true)}
         className="flex size-10 items-center justify-center focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
-        {open ? <X aria-hidden /> : <Menu aria-hidden />}
+        <Menu aria-hidden />
       </button>
-      {open && (
-        <div
-          id="menu-movil"
-          ref={panelRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Menú"
-          onKeyDown={onKeyDown}
-          className="fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col gap-2 overflow-y-auto border-t bg-background px-4 py-8"
-        >
-          <nav aria-label="Menú móvil">
-            <ul className="flex flex-col">
-              {items.map((item, index) => (
-                <li key={item.id} className="border-b">
-                  <SectionLink
-                    id={item.id}
-                    onNavigate={() => toggle(false)}
-                    className="font-display flex items-baseline gap-4 py-5 text-2xl font-extrabold uppercase"
-                  >
-                    <span className="text-sm text-brand-text">{twoDigits(index + 1)}</span>
-                    {item.label}
-                  </SectionLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <button
-            type="button"
-            onClick={() => toggle(false)}
-            className="mt-6 self-start text-sm underline"
-          >
-            Cerrar menú
-          </button>
-        </div>
-      )}
+      {/* Portal en <body>: el backdrop-blur de la barra crearía un contenedor para los `fixed`
+          y el modal quedaría encerrado en la altura del header. */}
+      {open &&
+        createPortal(
+          <div className="fixed inset-0 z-50">
+            <div
+              aria-hidden
+              data-testid="menu-fondo"
+              onClick={close}
+              className="absolute inset-0 bg-ink-950/60 backdrop-blur-sm"
+            />
+            <div
+              id="menu-movil"
+              ref={panelRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Menú"
+              onKeyDown={onKeyDown}
+              className="absolute inset-y-0 right-0 flex w-[85%] max-w-sm flex-col overflow-y-auto border-l bg-background px-6 pb-8 shadow-2xl"
+            >
+              <div className="flex h-16 shrink-0 items-center justify-between">
+                <Logo />
+                <button
+                  type="button"
+                  onClick={close}
+                  aria-label="Cerrar menú"
+                  className="-mr-2 flex size-10 items-center justify-center focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                >
+                  <X aria-hidden />
+                </button>
+              </div>
+              <nav aria-label="Menú móvil" className="mt-6">
+                <ul className="flex flex-col">
+                  {items.map((item, index) => (
+                    <li key={item.id} className="border-b">
+                      <SectionLink
+                        id={item.id}
+                        onNavigate={() => setOpen(false)}
+                        className="font-display flex items-baseline gap-4 py-5 text-2xl font-extrabold uppercase"
+                      >
+                        <span className="text-sm text-brand-text">{twoDigits(index + 1)}</span>
+                        {item.label}
+                      </SectionLink>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

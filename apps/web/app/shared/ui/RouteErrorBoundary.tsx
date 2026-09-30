@@ -6,15 +6,21 @@ export function RouteErrorBoundary() {
   const error = useRouteError();
   if (isRouteErrorResponse(error) && error.status === 404) {
     return (
-      <NotFound
-        homeLink={
-          <Link to="/" className="font-medium text-brand-text underline underline-offset-4">
-            Volver al inicio
-          </Link>
-        }
-      />
+      <div className="pt-16">
+        <NotFound
+          homeLink={
+            <Link to="/" className="font-medium text-brand-text underline underline-offset-4">
+              Volver al inicio
+            </Link>
+          }
+        />
+      </div>
     );
   }
   if (import.meta.env.DEV) console.error(error);
-  return <RouteError />;
+  return (
+    <div className="pt-16">
+      <RouteError />
+    </div>
+  );
 }

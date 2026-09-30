@@ -106,7 +106,7 @@ Un componente cliente mantiene el índice activo:
 - *Alternativa descartada:* un formulario que arme el mensaje. El usuario eligió WhatsApp directo y sin formularios.
 
 ### D8. Navegación a secciones
-Las secciones del inicio tienen ids estables (`#servicios`, `#como-trabajamos`, `#trabajos`, `#preguntas`, `#servicio-<slug>`). Los enlaces de la navbar son `/#id`; React Router maneja el scroll al hash, con `scroll-margin-top` igual a la altura de la navbar. La navbar se oculta al bajar y reaparece al subir (umbral de 8 px). En desktop no se oculta mientras el menú tenga foco.
+Las secciones del inicio tienen ids estables (`#servicios`, `#como-trabajamos`, `#trabajos`, `#preguntas`, `#servicio-<slug>`). Los enlaces de la navbar son `/#id`; React Router maneja el scroll al hash, con `scroll-margin-top` igual a la altura de la navbar. La navbar es `position: fixed` y siempre visible: flota sobre el contenido sin reservar espacio (el hero tiene `padding-top` igual a su altura y arranca detrás de ella). En celulares el menú es un modal con panel lateral y fondo oscurecido.
 
 ### D9. SEO
 - Una función `buildMeta()` centraliza título, descripción, canonical (`PUBLIC_SITE_URL` + ruta) y Open Graph/Twitter.

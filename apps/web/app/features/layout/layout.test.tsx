@@ -22,6 +22,22 @@ describe('Navbar', () => {
     );
   });
 
+  it('es fija arriba y no reserva espacio en la página', () => {
+    renderWithRouter(<Navbar site={siteContent()} />);
+    expect(screen.getByRole('banner')).toHaveClass('fixed', 'top-0');
+  });
+
+  it('el menú móvil es un modal que se cierra al tocar el fondo', async () => {
+    const user = userEvent.setup();
+    renderWithRouter(<Navbar site={siteContent()} />);
+    await user.click(screen.getByRole('button', { name: 'Abrir menú' }));
+    expect(screen.getByRole('dialog', { name: 'Menú' })).toHaveAttribute('aria-modal', 'true');
+    expect(document.body.style.overflow).toBe('hidden');
+    await user.click(screen.getByTestId('menu-fondo'));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(document.body.style.overflow).toBe('');
+  });
+
   it('oculta el enlace a Trabajos si no hay trabajos publicados', () => {
     renderWithRouter(<Navbar site={{ ...siteContent(), hasProjects: false }} />);
     const nav = screen.getByRole('navigation', { name: 'Principal' });

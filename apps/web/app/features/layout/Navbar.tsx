@@ -1,31 +1,17 @@
 import type { SiteContent } from '@tamila/shared';
-import { cn, Logo, ThemeToggle } from '@tamila/ui';
-import { useState } from 'react';
+import { Logo, ThemeToggle } from '@tamila/ui';
 import { Link } from 'react-router';
 import { WhatsAppButton } from '~/features/whatsapp';
 import { MobileMenu } from './MobileMenu';
 import { navItems } from './nav-items';
 import { SectionLink } from './SectionLink';
-import { useHideOnScroll } from './useHideOnScroll';
 
+/** Barra fija y siempre visible: flota sobre el contenido sin reservar espacio. */
 export function Navbar({ site }: { site: SiteContent }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [focusWithin, setFocusWithin] = useState(false);
-  const hidden = useHideOnScroll(menuOpen || focusWithin);
   const items = navItems(site);
 
   return (
-    <header
-      data-hidden={hidden}
-      onFocus={() => setFocusWithin(true)}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget)) setFocusWithin(false);
-      }}
-      className={cn(
-        'sticky top-0 z-30 border-b bg-background/95 backdrop-blur transition-transform duration-300 motion-reduce:transition-none',
-        hidden && '-translate-y-full',
-      )}
-    >
+    <header className="fixed inset-x-0 top-0 z-30 border-b bg-background/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link to="/" aria-label="TAMILA, ir al inicio" className="shrink-0">
           <Logo />
@@ -54,7 +40,7 @@ export function Navbar({ site }: { site: SiteContent }) {
           >
             Pedir presupuesto
           </WhatsAppButton>
-          <MobileMenu items={items} onOpenChange={setMenuOpen} />
+          <MobileMenu items={items} />
         </div>
       </div>
     </header>
