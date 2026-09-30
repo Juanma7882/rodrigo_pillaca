@@ -125,7 +125,7 @@ El seed es idempotente: hace upsert por `slug` / `order` / hash de archivo. Los 
 ## Risks / Trade-offs
 
 - **[Imágenes de muestra que no representan trabajos reales]** → se marcan con `credit` y el admin del próximo change permite reemplazarlas. No se deben presentar como "trabajos realizados" reales en producción: el seed de trabajos de ejemplo solo corre si `SEED_SAMPLE_PROJECTS=true`, que en producción está en `false`.
-- **[Página larga: 8 capítulos + secciones]** → lazy loading de imágenes, `content-visibility: auto` en capítulos fuera de pantalla, y el comparador antes/después cargado con `React.lazy`.
+- **[Página larga: 8 capítulos + secciones]** → lazy loading de imágenes y el comparador antes/después cargado con `React.lazy`. Se descartó `content-visibility: auto` en los capítulos: sus alturas estimadas desplazaban el layout al navegar a una sección (`/#preguntas`) y el destino quedaba fuera de pantalla.
 - **[SSR depende de la API: si la API cae, el sitio cae]** → el loader muestra un `ErrorBoundary` amable con el botón de WhatsApp (el número va como fallback en una variable de entorno de web). Las respuestas se cachean 60 s.
 - **[Los datos de contacto del negocio todavía no están definidos]** → quedan como variables del seed; el sitio no muestra lo que esté vacío.
 - **[Tipografías pesadas]** → solo se incluyen los pesos y el subset latino necesarios, con `font-display: swap` y preload del peso de títulos.

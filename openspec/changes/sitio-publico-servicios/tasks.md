@@ -24,39 +24,39 @@
 
 ## 5. Base editorial en `packages/ui` y web
 
-- [ ] 5.1 Agregar Montserrat (800/900) e Inter (400/500/600) con `@fontsource` (subset latino), tokens tipográficos y preload del peso de títulos, y verificar en DevTools que no hay requests a dominios de fuentes externos
-- [ ] 5.2 Crear los componentes `ChapterNumber`, `Eyebrow`, `Rule`, `PullQuote` y `ResponsiveImage` (con `<picture>`, `srcset`, `width`/`height`, lazy y grayscale→color al hover), y verificar con tests Vitest y revisión visual en claro y oscuro
-- [ ] 5.3 Crear en web el cliente de la API para loaders (usa `API_INTERNAL_URL` en el servidor) y el `loader` de `root` con la configuración del sitio, y verificar que un error de la API muestra el `ErrorBoundary` con el botón de WhatsApp de fallback
+- [x] 5.1 Agregar Montserrat (800/900) e Inter (400/500/600) con `@fontsource` (subset latino), tokens tipográficos y preload del peso de títulos, y verificar en DevTools que no hay requests a dominios de fuentes externos
+- [x] 5.2 Crear los componentes `ChapterNumber`, `Eyebrow`, `Rule`, `PullQuote` y `ResponsiveImage` (con `<picture>`, `srcset`, `width`/`height`, lazy y grayscale→color al hover), y verificar con tests Vitest y revisión visual en claro y oscuro
+- [x] 5.3 Crear en web el cliente de la API para loaders (usa `API_INTERNAL_URL` en el servidor) y el `loader` de `root` con la configuración del sitio, y verificar que un error de la API muestra el `ErrorBoundary` con el botón de WhatsApp de fallback
 
 ## 6. Layout y WhatsApp
 
-- [ ] 6.1 Implementar `buildWhatsAppUrl`, `WhatsAppButton` (no renderiza sin número) y `FloatingWhatsApp`, y verificar con tests Vitest la URL codificada, el mensaje por servicio y el caso sin número
-- [ ] 6.2 Implementar la `Navbar` (logo, enlaces `/#seccion`, toggle de tema, CTA; se oculta al bajar y reaparece al subir) y el `MobileMenu` accesible (Escape, foco atrapado, cierre al elegir), y verificar con tests Vitest y a mano en 375 px
-- [ ] 6.3 Implementar el `Footer` (logo, servicios publicados, WhatsApp, redes configuradas, horario, año) y verificar con un test que una red vacía no se renderiza
+- [x] 6.1 Implementar `buildWhatsAppUrl`, `WhatsAppButton` (no renderiza sin número) y `FloatingWhatsApp`, y verificar con tests Vitest la URL codificada, el mensaje por servicio y el caso sin número
+- [x] 6.2 Implementar la `Navbar` (logo, enlaces `/#seccion`, toggle de tema, CTA; se oculta al bajar y reaparece al subir) y el `MobileMenu` accesible (Escape, foco atrapado, cierre al elegir), y verificar con tests Vitest y a mano en 375 px
+- [x] 6.3 Implementar el `Footer` (logo, servicios publicados, WhatsApp, redes configuradas, horario, año) y verificar con un test que una red vacía no se renderiza
 
 ## 7. Inicio
 
-- [ ] 7.1 Implementar la ruta `/` con un `loader` que pide `/site`, `/services` y `/projects` en paralelo, más `meta`, y verificar con `curl` que el HTML del servidor contiene el título del hero y los nombres de los servicios
-- [ ] 7.2 Implementar el `Hero` a pantalla completa con título centrado, subtítulo y CTA, y verificar a 375 px y 1440 px que todo es visible sin scroll
-- [ ] 7.3 Implementar `ServicesIndex` ("CONTENIDO", dos columnas numeradas, clic → `#servicio-<slug>`) y `RotatingCover` (4 s, crossfade, pausa con hover/foco, sin rotación con movimiento reducido o pestaña oculta), y verificar con tests Vitest usando timers falsos
-- [ ] 7.4 Implementar `ServiceChapter` con la disposición editorial de D5 (espejada en pares, una columna en celulares, bloque de trabajo destacado opcional, CTA por servicio), y verificar visualmente en claro y oscuro a 375, 768 y 1440 px
-- [ ] 7.5 Implementar `ProcessSteps` numerados y verificar el orden con un test
-- [ ] 7.6 Implementar `ProjectsGallery` y `BeforeAfter` (cargado con `React.lazy`, operable con mouse, táctil y flechas; sección oculta sin trabajos), y verificar con tests Vitest y que el chunk de `BeforeAfter` solo se pide al llegar a la sección
-- [ ] 7.7 Implementar `FaqAccordion` accesible (`aria-expanded`, teclado) y verificar con un test
-- [ ] 7.8 Agregar las animaciones de entrada con `IntersectionObserver`, desactivadas con `prefers-reduced-motion`, y `content-visibility: auto` en los capítulos, y verificar que con movimiento reducido no hay transiciones
+- [x] 7.1 Implementar la ruta `/` con un `loader` que pide `/site`, `/services` y `/projects` en paralelo, más `meta`, y verificar con `curl` que el HTML del servidor contiene el título del hero y los nombres de los servicios
+- [x] 7.2 Implementar el `Hero` a pantalla completa con título centrado, subtítulo y CTA, y verificar a 375 px y 1440 px que todo es visible sin scroll
+- [x] 7.3 Implementar `ServicesIndex` ("CONTENIDO", dos columnas numeradas, clic → `#servicio-<slug>`) y `RotatingCover` (4 s, crossfade, pausa con hover/foco, sin rotación con movimiento reducido o pestaña oculta), y verificar con tests Vitest usando timers falsos
+- [x] 7.4 Implementar `ServiceChapter` con la disposición editorial de D5 (espejada en pares, una columna en celulares, bloque de trabajo destacado opcional, CTA por servicio), y verificar visualmente en claro y oscuro a 375, 768 y 1440 px
+- [x] 7.5 Implementar `ProcessSteps` numerados y verificar el orden con un test
+- [x] 7.6 Implementar `ProjectsGallery` y `BeforeAfter` (cargado con `React.lazy`, operable con mouse, táctil y flechas; sección oculta sin trabajos), y verificar con tests Vitest y que el chunk de `BeforeAfter` solo se pide al llegar a la sección
+- [x] 7.7 Implementar `FaqAccordion` accesible (`aria-expanded`, teclado) y verificar con un test
+- [x] 7.8 Agregar las animaciones de entrada con `IntersectionObserver`, desactivadas con `prefers-reduced-motion` (sin `content-visibility`: rompía la navegación a secciones, ver design), y verificar que con movimiento reducido no hay transiciones
 
 ## 8. Página por servicio
 
-- [ ] 8.1 Implementar `/servicios/:slug` con `loader` (404 real si no existe), capítulo completo, trabajos del rubro, anterior/siguiente y CTA, y verificar con `curl` el status 200 para `durlock` y 404 para `no-existe`
+- [x] 8.1 Implementar `/servicios/:slug` con `loader` (404 real si no existe), capítulo completo, trabajos del rubro, anterior/siguiente y CTA, y verificar con `curl` el status 200 para `durlock` y 404 para `no-existe`
 
 ## 9. SEO
 
-- [ ] 9.1 Implementar `buildMeta` (título, descripción, canonical con `PUBLIC_SITE_URL`, Open Graph) en `/` y `/servicios/:slug`, y verificar que el HTML del servidor trae las etiquetas correctas
-- [ ] 9.2 Agregar JSON-LD `HomeAndConstructionBusiness` en el inicio y `Service` en cada servicio, y verificar con el validador de schema.org
-- [ ] 9.3 Implementar las resource routes `/sitemap.xml` y `/robots.txt` (dinámicas, caché de 1 h), y verificar que un servicio despublicado desaparece del sitemap
+- [x] 9.1 Implementar `buildMeta` (título, descripción, canonical con `PUBLIC_SITE_URL`, Open Graph) en `/` y `/servicios/:slug`, y verificar que el HTML del servidor trae las etiquetas correctas
+- [x] 9.2 Agregar JSON-LD `HomeAndConstructionBusiness` en el inicio y `Service` en cada servicio, y verificar con el validador de schema.org
+- [x] 9.3 Implementar las resource routes `/sitemap.xml` y `/robots.txt` (dinámicas, caché de 1 h), y verificar que un servicio despublicado desaparece del sitemap
 
 ## 10. Pruebas y cierre
 
-- [ ] 10.1 Escribir los tests E2E con Playwright: navegación de la navbar a secciones (desktop y móvil), clic en el índice → capítulo, hover en el índice cambia la imagen, enlaces de WhatsApp con el mensaje correcto, página de servicio y 404; verificar que todos pasan
+- [x] 10.1 Escribir los tests E2E con Playwright: navegación de la navbar a secciones (desktop y móvil), clic en el índice → capítulo, hover en el índice cambia la imagen, enlaces de WhatsApp con el mensaje correcto, página de servicio y 404; verificar que todos pasan
 - [ ] 10.2 Correr Lighthouse en el inicio (móvil) y verificar Performance ≥ 90, Accessibility ≥ 95 y SEO ≥ 95; corregir lo que falte
 - [ ] 10.3 Ejecutar `pnpm turbo run lint typecheck test build` y `pnpm test:e2e`, verificar que todo pasa, reindexar en codebase-memory y guardar en engram las convenciones editoriales y del modelo de contenido
