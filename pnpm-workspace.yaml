@@ -1,0 +1,18 @@
+packages:
+  - apps/*
+  - packages/*
+  - e2e
+
+# Dependencias autorizadas a ejecutar scripts de instalación.
+allowBuilds:
+  esbuild: true
+  '@prisma/engines': true
+  prisma: true
+  '@prisma/client': true
+  argon2: true
+  sharp: true
+  '@swc/core': true
+  '@nestjs/core': false
+  unrs-resolver: true
+  '@scarf/scarf': false
+  '@parcel/watcher': false

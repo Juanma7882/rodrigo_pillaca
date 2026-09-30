@@ -1,0 +1,37 @@
+{
+  "name": "@tamila/root",
+  "private": true,
+  "packageManager": "pnpm@12.4.2",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky",
+    "dev:up": "docker compose --env-file .env -f docker/compose.dev.yml up -d --build",
+    "dev:down": "docker compose --env-file .env -f docker/compose.dev.yml down",
+    "dev:logs": "docker compose --env-file .env -f docker/compose.dev.yml logs -f --tail=100",
+    "dev:ps": "docker compose --env-file .env -f docker/compose.dev.yml ps"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@tamila/config": "workspace:*",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.9",
+    "turbo": "^2.11.5",
+    "typescript": "~6.0.3"
+  },
+  "prettier": "@tamila/config/prettier",
+  "type": "module"
+}

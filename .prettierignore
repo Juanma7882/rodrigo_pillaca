@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+openspec/
+.claude/
+**/dist/
+**/build/
+**/.react-router/
+**/coverage/
+**/playwright-report/
+**/test-results/
