@@ -59,4 +59,4 @@
 
 - [x] 10.1 Escribir los tests E2E con Playwright: navegación de la navbar a secciones (desktop y móvil), clic en el índice → capítulo, hover en el índice cambia la imagen, enlaces de WhatsApp con el mensaje correcto, página de servicio y 404; verificar que todos pasan
 - [ ] 10.2 Correr Lighthouse en el inicio (móvil) y verificar Performance ≥ 90, Accessibility ≥ 95 y SEO ≥ 95; corregir lo que falte
-- [ ] 10.3 Ejecutar `pnpm turbo run lint typecheck test build` y `pnpm test:e2e`, verificar que todo pasa, reindexar en codebase-memory y guardar en engram las convenciones editoriales y del modelo de contenido
+- [x] 10.3 Ejecutar `pnpm turbo run lint typecheck test build` y `pnpm test:e2e`, verificar que todo pasa, reindexar en codebase-memory y guardar en engram las convenciones editoriales y del modelo de contenido
