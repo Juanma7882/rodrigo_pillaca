@@ -64,17 +64,17 @@
 
 ## 9. Pruebas E2E
 
-- [ ] 9.1 Crear el workspace `e2e/` con Playwright configurado contra el stack local y las claves de prueba de Turnstile, y verificar que `pnpm test:e2e` ejecuta
-- [ ] 9.2 Escribir los tests E2E: login y logout del admin, redirección sin sesión, toggle de tema persistente, 404 en web y admin, y chunk de ruta descargado solo al navegar; verificar que todos pasan
+- [x] 9.1 Crear el workspace `e2e/` con Playwright configurado contra el stack local y las claves de prueba de Turnstile, y verificar que `pnpm test:e2e` ejecuta
+- [x] 9.2 Escribir los tests E2E: login y logout del admin, redirección sin sesión, toggle de tema persistente, 404 en web y admin, y chunk de ruta descargado solo al navegar; verificar que todos pasan
 
 ## 10. CI/CD y ramas
 
-- [ ] 10.1 Crear `.github/workflows/ci.yml` (install congelado, lint, typecheck, test y build con cache de Turbo + job E2E con Postgres de servicio) para PRs a `develop`/`main`, y verificar que corre en verde en un PR de prueba
+- [x] 10.1 Crear `.github/workflows/ci.yml` (install congelado, lint, typecheck, test y build con cache de Turbo + job E2E con Postgres de servicio) para PRs a `develop`/`main`, y verificar que corre en verde en un PR de prueba
 - [x] 10.2 Crear `.github/workflows/deploy.yml` (build y push de imágenes a GHCR con tag SHA; en la VPS por SSH: pull → migrate → up → check de health; abortar si migrate falla), y verificar su sintaxis con `actionlint`
-- [ ] 10.3 Hacer el commit inicial en `main`, crear la rama `develop` y hacer push de ambas a `origin` (con confirmación del usuario), y verificar con `git ls-remote origin`
+- [x] 10.3 Hacer el commit inicial en `main`, crear la rama `develop` y hacer push de ambas a `origin` (con confirmación del usuario), y verificar con `git ls-remote origin`
 - [x] 10.4 Documentar en el README los pasos manuales: protección de ramas en GitHub, secrets requeridos y preparación de la VPS; verificar que la lista de secrets coincide con `.env.example`
 
 ## 11. Cierre
 
-- [ ] 11.1 Ejecutar `pnpm turbo run lint typecheck test build` y `pnpm test:e2e` desde la raíz y verificar que todo pasa
+- [x] 11.1 Ejecutar `pnpm turbo run lint typecheck test build` y `pnpm test:e2e` desde la raíz y verificar que todo pasa
 - [x] 11.2 Reindexar el repo en codebase-memory y guardar en engram las convenciones establecidas (estructura por features, tokens, auth)
