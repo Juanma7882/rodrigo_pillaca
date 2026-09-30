@@ -58,7 +58,7 @@ services:
 
   api:
     <<: *node
-    command: sh -c "pnpm --filter @tamila/api exec prisma migrate deploy && pnpm --filter @tamila/api dev"
+    command: sh -c "pnpm --filter @tamila/api generate && pnpm --filter @tamila/api exec prisma migrate deploy && pnpm --filter @tamila/api dev"
     environment:
       NODE_ENV: development
       MEDIA_DIR: /data/media

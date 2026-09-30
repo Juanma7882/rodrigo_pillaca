@@ -63,11 +63,16 @@ services:
 
   web:
     image: ${IMAGE_PREFIX:-tamila}/web:${IMAGE_TAG:-local}
-    build: { context: .., dockerfile: docker/web.Dockerfile }
+    build:
+      context: ..
+      dockerfile: docker/web.Dockerfile
+      args:
+        VITE_WHATSAPP_FALLBACK: ${VITE_WHATSAPP_FALLBACK:-}
     restart: unless-stopped
     environment:
       NODE_ENV: production
       API_INTERNAL_URL: http://api:3000
+      PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}
     depends_on:
       api:
         condition: service_healthy

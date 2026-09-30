@@ -39,6 +39,7 @@ jobs:
             ${{ env.IMAGE_PREFIX }}/${{ matrix.image }}:latest
           build-args: |
             VITE_TURNSTILE_SITE_KEY=${{ vars.TURNSTILE_SITE_KEY }}
+            VITE_WHATSAPP_FALLBACK=${{ vars.WHATSAPP_FALLBACK }}
           cache-from: type=gha,scope=${{ matrix.image }}
           cache-to: type=gha,mode=max,scope=${{ matrix.image }}
 

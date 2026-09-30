@@ -70,6 +70,7 @@ jobs:
         run: |
           pnpm --filter @tamila/api exec prisma migrate deploy
           pnpm --filter @tamila/api seed:admin
+          SEED_SAMPLE_PROJECTS=true SEED_WHATSAPP_NUMBER=5491100000000 pnpm --filter @tamila/api seed:content
           (cd apps/api && NODE_ENV=production node dist/src/main > ../../api.log 2>&1 &)
           (cd apps/web && PORT=4173 pnpm start > ../../web.log 2>&1 &)
           (cd apps/admin && pnpm exec vite preview --port 4174 --strictPort > ../../admin.log 2>&1 &)

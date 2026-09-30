@@ -11,7 +11,7 @@ WORKDIR /repo
 FROM base AS build
 COPY . .
 RUN pnpm install --frozen-lockfile --filter "@tamila/api..."
-RUN pnpm --filter @tamila/shared build && pnpm --filter @tamila/api build
+RUN pnpm --filter @tamila/shared build && pnpm --filter @tamila/api generate && pnpm --filter @tamila/api build
 # Copia autocontenida de la API solo con dependencias de producción.
 RUN pnpm --filter @tamila/api deploy --prod /out
 
