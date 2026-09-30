@@ -23,6 +23,8 @@ export const envSchema = z.object({
   JWT_ACCESS_TTL_SECONDS: z.coerce.number().int().positive().default(900),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(7),
   TURNSTILE_SECRET_KEY: z.string({ error: 'TURNSTILE_SECRET_KEY es obligatoria' }).min(1),
+  /** Carpeta donde se guardan las imágenes (volumen persistente en Docker). */
+  MEDIA_DIR: z.string().min(1).default('./media'),
 });
 export type Env = z.infer<typeof envSchema>;
 
