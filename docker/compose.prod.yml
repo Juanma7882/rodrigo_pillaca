@@ -41,7 +41,11 @@ services:
     <<: *app-env
     image: ${IMAGE_PREFIX:-tamila}/api:${IMAGE_TAG:-local}
     restart: unless-stopped
-    environment: *db-env
+    environment:
+      <<: *db-env
+      MEDIA_DIR: /data/media
+    volumes:
+      - media:/data/media
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -85,11 +89,13 @@ services:
     volumes:
       - caddy-data:/data
       - caddy-config:/config
+      - media:/srv/media:ro
     depends_on:
       - web
       - api
 
 volumes:
   postgres-data:
+  media:
   caddy-data:
   caddy-config:

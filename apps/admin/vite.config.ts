@@ -14,6 +14,6 @@ export default defineConfig({
     host: true,
     port: Number(process.env.ADMIN_PORT ?? 4174),
     strictPort: true,
-    proxy: { '/api': apiTarget },
+    proxy: { '/api': apiTarget, '/media': apiTarget },
   },
 });
