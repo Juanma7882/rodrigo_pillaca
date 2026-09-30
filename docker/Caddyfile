@@ -1,0 +1,30 @@
+# SITE_DOMAIN / ADMIN_DOMAIN: dominios reales en producción (HTTPS automático).
+# Para probar localmente: SITE_DOMAIN=http://localhost ADMIN_DOMAIN=http://admin.localhost
+
+(api) {
+	handle /api/* {
+		reverse_proxy api:3000
+	}
+}
+
+{$SITE_DOMAIN} {
+	encode zstd gzip
+	import api
+	handle {
+		reverse_proxy web:3000
+	}
+}
+
+{$ADMIN_DOMAIN} {
+	encode zstd gzip
+	header X-Robots-Tag "noindex, nofollow"
+	import api
+	handle {
+		root * /srv/admin
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=31536000, immutable"
+		header /index.html Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+}

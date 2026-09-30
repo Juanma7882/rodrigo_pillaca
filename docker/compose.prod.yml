@@ -1,0 +1,95 @@
+name: tamila
+
+# Producción (VPS). Las imágenes vienen de GHCR con el tag del commit:
+#   IMAGE_PREFIX=ghcr.io/juanma7882/rodrigo_pillaca IMAGE_TAG=<sha> docker compose -f compose.prod.yml up -d
+# Para construirlas localmente: docker compose --env-file ../.env -f compose.prod.yml build
+
+x-app-env: &app-env
+  env_file: ${ENV_FILE:-.env}
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Aplica las migraciones pendientes y termina. Si falla, api no arranca.
+  migrate:
+    <<: *app-env
+    image: ${IMAGE_PREFIX:-tamila}/api:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: docker/api.Dockerfile }
+    command: ['node_modules/.bin/prisma', 'migrate', 'deploy']
+    environment: &db-env
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+    restart: 'no'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *app-env
+    image: ${IMAGE_PREFIX:-tamila}/api:${IMAGE_TAG:-local}
+    restart: unless-stopped
+    environment: *db-env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  web:
+    image: ${IMAGE_PREFIX:-tamila}/web:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: docker/web.Dockerfile }
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      API_INTERNAL_URL: http://api:3000
+    depends_on:
+      api:
+        condition: service_healthy
+
+  caddy:
+    image: ${IMAGE_PREFIX:-tamila}/caddy:${IMAGE_TAG:-local}
+    build:
+      context: ..
+      dockerfile: docker/caddy.Dockerfile
+      args:
+        VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY}
+    restart: unless-stopped
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+      ADMIN_DOMAIN: ${ADMIN_DOMAIN}
+    ports:
+      - '${HTTP_PORT:-80}:80'
+      - '${HTTPS_PORT:-443}:443'
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - web
+      - api
+
+volumes:
+  postgres-data:
+  caddy-data:
+  caddy-config:

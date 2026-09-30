@@ -1,0 +1,17 @@
+**/node_modules
+**/dist
+**/build
+**/.react-router
+**/.turbo
+**/coverage
+**/playwright-report
+**/test-results
+**/*.tsbuildinfo
+**/.env
+**/.env.*
+!.env.example
+.git
+.claude
+.codebase-memory
+openspec
+apps/api/src/generated

@@ -1,0 +1,103 @@
+name: tamila-dev
+
+# Uso: pnpm dev:up  (equivale a docker compose --env-file .env -f docker/compose.dev.yml up -d)
+
+x-node: &node
+  build:
+    context: .
+    dockerfile: dev.Dockerfile
+  image: tamila-dev-node
+  user: '${DEV_UID:-1000}:${DEV_GID:-1000}'
+  working_dir: /app
+  env_file: ../.env
+  volumes: &node-volumes
+    - ..:/app
+    # node_modules propios del contenedor (binarios nativos de Linux), separados del host.
+    - node_modules:/app/node_modules
+    - node_modules_api:/app/apps/api/node_modules
+    - node_modules_web:/app/apps/web/node_modules
+    - node_modules_admin:/app/apps/admin/node_modules
+    - node_modules_config:/app/packages/config/node_modules
+    - node_modules_shared:/app/packages/shared/node_modules
+    - node_modules_ui:/app/packages/ui/node_modules
+    - node_modules_e2e:/app/e2e/node_modules
+    - pnpm_store:/pnpm/store
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - '${POSTGRES_PORT:-5435}:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init-test-db.sh:/docker-entrypoint-initdb.d/10-init-test-db.sh:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Instala dependencias y compila @tamila/shared una vez; el resto espera a que termine.
+  install:
+    <<: *node
+    command: sh -c "pnpm install --frozen-lockfile --store-dir /pnpm/store && pnpm --filter @tamila/shared build"
+
+  shared:
+    <<: *node
+    command: pnpm --filter @tamila/shared dev
+    depends_on:
+      install:
+        condition: service_completed_successfully
+
+  api:
+    <<: *node
+    command: sh -c "pnpm --filter @tamila/api exec prisma migrate deploy && pnpm --filter @tamila/api dev"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+    ports:
+      - '${API_PORT:-3000}:3000'
+    depends_on:
+      install:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+
+  web:
+    <<: *node
+    command: pnpm --filter @tamila/web dev
+    environment:
+      API_INTERNAL_URL: http://api:3000
+    ports:
+      - '${WEB_PORT:-4173}:${WEB_PORT:-4173}'
+    depends_on:
+      install:
+        condition: service_completed_successfully
+
+  admin:
+    <<: *node
+    command: pnpm --filter @tamila/admin dev
+    environment:
+      API_INTERNAL_URL: http://api:3000
+    ports:
+      - '${ADMIN_PORT:-4174}:${ADMIN_PORT:-4174}'
+    depends_on:
+      install:
+        condition: service_completed_successfully
+
+volumes:
+  postgres-data:
+  pnpm_store:
+  node_modules:
+  node_modules_api:
+  node_modules_web:
+  node_modules_admin:
+  node_modules_config:
+  node_modules_shared:
+  node_modules_ui:
+  node_modules_e2e:
