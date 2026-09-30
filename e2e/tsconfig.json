@@ -1,0 +1,11 @@
+{
+  "extends": "@tamila/config/tsconfig/base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "noEmit": true,
+    "lib": ["ES2023", "DOM"]
+  },
+  "include": ["playwright.config.ts", "tests"]
+}
