@@ -41,6 +41,7 @@ describe('LoginPage', () => {
 
   it('no permite enviar hasta resolver Turnstile', async () => {
     renderLogin();
+    expect(screen.getByRole('heading', { level: 1, name: 'Iniciar sesión' })).toBeInTheDocument();
     const submit = screen.getByRole('button', { name: 'Ingresar' });
     expect(submit).toBeDisabled();
     await userEvent.click(screen.getByRole('button', { name: 'Resolver desafío' }));

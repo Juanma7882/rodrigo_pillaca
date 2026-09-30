@@ -6,7 +6,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
   Input,
   Label,
   ThemeToggle,
@@ -64,7 +63,8 @@ export function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <p className="text-xs font-semibold tracking-[0.3em] text-brand-text uppercase">TAMILA</p>
-          <CardTitle className="text-2xl">Iniciar sesión</CardTitle>
+          {/* CardTitle es un <div>: la página necesita un encabezado real para accesibilidad. */}
+          <h1 className="text-2xl leading-none font-semibold">Iniciar sesión</h1>
           <CardDescription>Panel de administración del sitio.</CardDescription>
         </CardHeader>
         <CardContent>
