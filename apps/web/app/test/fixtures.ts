@@ -17,6 +17,7 @@ export const siteContent = (overrides: Partial<SiteContent['settings']> = {}): S
   settings: {
     heroTitle: 'Construimos, renovamos, terminamos.',
     heroSubtitle: 'Un solo equipo para toda tu obra.',
+    heroImage: null,
     whatsappNumber: '5491100000000',
     whatsappDefaultMessage: 'Hola, quiero hacer una consulta.',
     instagramUrl: 'https://instagram.com/tamila',

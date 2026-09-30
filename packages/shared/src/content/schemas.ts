@@ -26,6 +26,8 @@ export type ServiceLink = z.infer<typeof serviceLinkSchema>;
 export const siteSettingsSchema = z.object({
   heroTitle: z.string(),
   heroSubtitle: z.string(),
+  /** Foto de fondo del hero (opcional). */
+  heroImage: mediaAssetSchema.nullable(),
   whatsappNumber: z.string(),
   whatsappDefaultMessage: z.string(),
   instagramUrl: z.url().nullable(),

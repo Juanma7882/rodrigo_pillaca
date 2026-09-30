@@ -26,6 +26,7 @@ export const siteDefaults = {
   seoDescription:
     'Durlock, steelframe, pintura, pisos flotantes y de madera, pulido, plomería, electricidad y gas. Pedí tu presupuesto sin cargo por WhatsApp.',
   ogImageFile: 'steelframe-1.jpg',
+  heroImage: { file: 'hero-casa.jpg', alt: 'Casa moderna de dos plantas con grandes ventanales' },
 };
 
 export const processSteps = [

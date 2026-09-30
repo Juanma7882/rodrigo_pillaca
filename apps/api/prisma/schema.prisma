@@ -44,6 +44,9 @@ model SiteSettings {
   id                     Int         @id @default(1)
   heroTitle              String
   heroSubtitle           String
+  /// Foto de fondo del hero.
+  heroImageId            String?
+  heroImage              MediaAsset? @relation("SiteHeroImage", fields: [heroImageId], references: [id], onDelete: SetNull)
   /// Formato internacional sin "+" (ej. 5491122334455). Vacío = no se muestran botones de WhatsApp.
   whatsappNumber         String      @default("")
   whatsappDefaultMessage String
@@ -76,6 +79,7 @@ model MediaAsset {
   credit        String?
   createdAt     DateTime       @default(now())
   siteOgImage   SiteSettings[] @relation("SiteOgImage")
+  siteHeroImage SiteSettings[] @relation("SiteHeroImage")
   serviceCovers Service[]      @relation("ServiceCover")
   serviceImages ServiceImage[]
   projectBefore Project[]      @relation("ProjectBefore")

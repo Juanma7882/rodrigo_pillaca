@@ -44,6 +44,7 @@
 - [x] 7.6 Implementar `ProjectsGallery` y `BeforeAfter` (cargado con `React.lazy`, operable con mouse, táctil y flechas; sección oculta sin trabajos), y verificar con tests Vitest y que el chunk de `BeforeAfter` solo se pide al llegar a la sección
 - [x] 7.7 Implementar `FaqAccordion` accesible (`aria-expanded`, teclado) y verificar con un test
 - [x] 7.8 Agregar las animaciones de entrada con `IntersectionObserver`, desactivadas con `prefers-reduced-motion` (sin `content-visibility`: rompía la navegación a secciones, ver design), y verificar que con movimiento reducido no hay transiciones
+- [x] 7.9 Agregar la foto de fondo del hero (`SiteSettings.heroImageId`, migración, esquema, API, seed con una foto de licencia libre y su crédito) con capa oscura y texto blanco, y verificar con un test que sin foto no se renderiza la imagen y con foto se carga con prioridad
 
 ## 8. Página por servicio
 

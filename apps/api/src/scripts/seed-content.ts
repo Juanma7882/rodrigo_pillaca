@@ -50,7 +50,8 @@ async function main() {
 
   try {
     const ogImage = await imageByFile(siteDefaults.ogImageFile);
-    await prisma.siteSettings.upsert({
+    const heroImage = await image(siteDefaults.heroImage.file, siteDefaults.heroImage.alt);
+    const settings = await prisma.siteSettings.upsert({
       where: { id: 1 },
       update: {},
       create: {
@@ -67,8 +68,13 @@ async function main() {
         seoTitle: siteDefaults.seoTitle,
         seoDescription: siteDefaults.seoDescription,
         ogImageId: ogImage.id,
+        heroImageId: heroImage.id,
       },
     });
+    // Configuración creada antes de existir la foto del hero: solo se completa el campo vacío.
+    if (!settings.heroImageId) {
+      await prisma.siteSettings.update({ where: { id: 1 }, data: { heroImageId: heroImage.id } });
+    }
 
     for (const [index, step] of processSteps.entries()) {
       await prisma.processStep.upsert({

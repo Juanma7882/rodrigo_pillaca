@@ -22,7 +22,7 @@ Referencias visuales del usuario: una página "CONTENT" (título enorme, índice
 
 ### D1. Modelo de contenido (Prisma)
 - **`SiteSettings`** (fila única, `id = 1`):
-  - Hero: `heroTitle`, `heroSubtitle`.
+  - Hero: `heroTitle`, `heroSubtitle`, `heroImageId?` (foto de fondo; se muestra en escala de grises con una capa oscura y el texto en blanco).
   - WhatsApp: `whatsappNumber` (formato internacional sin `+`), `whatsappDefaultMessage`.
   - Redes y horario: `instagramUrl?`, `facebookUrl?`, `tiktokUrl?`, `businessHours?`.
   - Textos y SEO: `footerText?`, `seoTitle`, `seoDescription`, `ogImageId?`.

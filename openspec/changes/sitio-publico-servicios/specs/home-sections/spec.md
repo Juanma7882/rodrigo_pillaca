@@ -13,6 +13,14 @@ La página de inicio SHALL abrir con una portada que ocupa el alto de la pantall
 - **WHEN** el usuario entra al inicio
 - **THEN** ve el título centrado, el subtítulo y el botón de WhatsApp sin hacer scroll
 
+#### Scenario: Foto de fondo
+- **WHEN** hay una imagen de portada configurada
+- **THEN** se muestra de fondo a pantalla completa, cubierta por una capa oscura que mantiene el contraste AA del texto, y se descarga con prioridad por ser la primera imagen visible
+
+#### Scenario: Sin foto de fondo
+- **WHEN** no hay imagen de portada configurada
+- **THEN** la portada se muestra sobre el fondo del tema, sin espacios vacíos
+
 ### Requirement: Cómo trabajamos
 El inicio SHALL mostrar los pasos del proceso de trabajo, numerados en orden (01, 02, …), cada uno con título y descripción.
 

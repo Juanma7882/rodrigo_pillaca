@@ -62,6 +62,7 @@ describe('esquemas de contenido público', () => {
       settings: {
         heroTitle: 'Construimos, renovamos, terminamos.',
         heroSubtitle: 'Reformas integrales',
+        heroImage: null,
         whatsappNumber: '',
         whatsappDefaultMessage: 'Hola',
         instagramUrl: null,

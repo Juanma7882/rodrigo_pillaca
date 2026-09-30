@@ -31,7 +31,10 @@ export class PublicContentService {
 
   async site(): Promise<SiteContent> {
     const [settings, services, processSteps, faqs, projectCount] = await Promise.all([
-      this.prisma.siteSettings.findUnique({ where: { id: 1 }, include: { ogImage: true } }),
+      this.prisma.siteSettings.findUnique({
+        where: { id: 1 },
+        include: { ogImage: true, heroImage: true },
+      }),
       this.prisma.service.findMany({
         where: { published: true },
         orderBy: { order: 'asc' },
@@ -43,9 +46,17 @@ export class PublicContentService {
     ]);
     if (!settings) throw new NotFoundException('El contenido del sitio todavía no fue cargado');
 
-    const { ogImage, id: _id, ogImageId: _og, updatedAt: _u, ...rest } = settings;
+    const {
+      ogImage,
+      heroImage,
+      id: _id,
+      ogImageId: _og,
+      heroImageId: _hero,
+      updatedAt: _u,
+      ...rest
+    } = settings;
     return {
-      settings: { ...rest, ogImage: toMediaDto(ogImage) },
+      settings: { ...rest, heroImage: toMediaDto(heroImage), ogImage: toMediaDto(ogImage) },
       services,
       processSteps: processSteps.map(({ order, title, description }) => ({
         order,
