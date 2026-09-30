@@ -32,7 +32,15 @@ La primera vez, crear el administrador:
 docker compose --env-file .env -f docker/compose.dev.yml exec api pnpm --filter @tamila/api seed:admin
 ```
 
-Se usan `ADMIN_EMAIL` y `ADMIN_PASSWORD` del `.env`. El login de desarrollo usa las claves de prueba de Cloudflare Turnstile, que siempre pasan.
+Y cargar el contenido inicial del sitio (servicios, pasos, preguntas frecuentes e imágenes de muestra):
+
+```bash
+docker compose --env-file .env -f docker/compose.dev.yml exec api pnpm --filter @tamila/api seed:content
+```
+
+El seed de admin usa `ADMIN_EMAIL` y `ADMIN_PASSWORD` del `.env`. El de contenido es idempotente y no pisa lo que ya exista. Las fotos de muestra son de Wikimedia Commons (ver `apps/api/prisma/seed-media/CREDITS.md`).
+
+Después de agregar dependencias, sincronizá los contenedores con `pnpm dev:install`. El login de desarrollo usa las claves de prueba de Cloudflare Turnstile, que siempre pasan.
 
 Para apagar todo: `pnpm dev:down`.
 
@@ -105,21 +113,26 @@ IMAGE_PREFIX=ghcr.io/juanma7882/rodrigo_pillaca IMAGE_TAG=<sha-anterior> docker 
 - Abrir los puertos 80 y 443.
 - Crear el directorio de la app (por defecto `~/tamila`) con un `.env` de producción basado en `.env.example`:
 
-| Variable                                                                                       | Valor en producción                                                            |
-| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`                                            | Credenciales de la base (clave larga y aleatoria)                              |
-| `DATABASE_URL`                                                                                 | La arma compose automáticamente: no hace falta                                 |
-| `JWT_ACCESS_SECRET`                                                                            | `openssl rand -base64 48`                                                      |
-| `JWT_ACCESS_TTL_SECONDS`, `REFRESH_TOKEN_TTL_DAYS`                                             | `900` y `7`                                                                    |
-| `TURNSTILE_SECRET_KEY`                                                                         | Secret key real de Cloudflare Turnstile                                        |
-| `VITE_TURNSTILE_SITE_KEY`                                                                      | No se usa en la VPS: va como variable de GitHub (`TURNSTILE_SITE_KEY`)         |
-| `CORS_ORIGINS`                                                                                 | `https://<SITE_DOMAIN>,https://<ADMIN_DOMAIN>`                                 |
-| `TRUST_PROXY_HOPS`                                                                             | `1` (Caddy)                                                                    |
-| `LOG_LEVEL`                                                                                    | `info`                                                                         |
-| `ADMIN_EMAIL`, `ADMIN_PASSWORD`                                                                | Administrador inicial (solo para el seed)                                      |
-| `SITE_DOMAIN`, `ADMIN_DOMAIN`                                                                  | Dominios reales, sin `http://` (p. ej. `tamila.com.ar`, `admin.tamila.com.ar`) |
-| `HTTP_PORT`, `HTTPS_PORT`                                                                      | `80` y `443`                                                                   |
-| `API_PORT`, `WEB_PORT`, `ADMIN_PORT`, `POSTGRES_PORT`, `DATABASE_URL_TEST`, `API_INTERNAL_URL` | Solo desarrollo: no hacen falta                                                |
+| Variable                                                                                                    | Valor en producción                                                            |
+| ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`                                                         | Credenciales de la base (clave larga y aleatoria)                              |
+| `DATABASE_URL`                                                                                              | La arma compose automáticamente: no hace falta                                 |
+| `JWT_ACCESS_SECRET`                                                                                         | `openssl rand -base64 48`                                                      |
+| `JWT_ACCESS_TTL_SECONDS`, `REFRESH_TOKEN_TTL_DAYS`                                                          | `900` y `7`                                                                    |
+| `TURNSTILE_SECRET_KEY`                                                                                      | Secret key real de Cloudflare Turnstile                                        |
+| `VITE_TURNSTILE_SITE_KEY`                                                                                   | No se usa en la VPS: va como variable de GitHub (`TURNSTILE_SITE_KEY`)         |
+| `CORS_ORIGINS`                                                                                              | `https://<SITE_DOMAIN>,https://<ADMIN_DOMAIN>`                                 |
+| `TRUST_PROXY_HOPS`                                                                                          | `1` (Caddy)                                                                    |
+| `LOG_LEVEL`                                                                                                 | `info`                                                                         |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD`                                                                             | Administrador inicial (solo para el seed)                                      |
+| `MEDIA_DIR`                                                                                                 | No hace falta: compose lo fija en `/data/media` (volumen persistente)          |
+| `PUBLIC_SITE_URL`                                                                                           | `https://<SITE_DOMAIN>` (canonical, Open Graph y sitemap)                      |
+| `SEED_WHATSAPP_NUMBER`, `SEED_INSTAGRAM_URL`, `SEED_FACEBOOK_URL`, `SEED_TIKTOK_URL`, `SEED_BUSINESS_HOURS` | Datos de contacto iniciales (formato de WhatsApp: internacional sin `+`)       |
+| `SEED_SAMPLE_PROJECTS`                                                                                      | `false`                                                                        |
+| `VITE_WHATSAPP_FALLBACK`                                                                                    | No se usa en la VPS: va como variable de GitHub (`WHATSAPP_FALLBACK`)          |
+| `SITE_DOMAIN`, `ADMIN_DOMAIN`                                                                               | Dominios reales, sin `http://` (p. ej. `tamila.com.ar`, `admin.tamila.com.ar`) |
+| `HTTP_PORT`, `HTTPS_PORT`                                                                                   | `80` y `443`                                                                   |
+| `API_PORT`, `WEB_PORT`, `ADMIN_PORT`, `POSTGRES_PORT`, `DATABASE_URL_TEST`, `API_INTERNAL_URL`              | Solo desarrollo: no hacen falta                                                |
 
 `IMAGE_PREFIX` e `IMAGE_TAG` no van en el `.env`: los define el workflow de deploy en cada despliegue.
 
@@ -127,7 +140,10 @@ Después del primer despliegue, crear el administrador:
 
 ```bash
 docker compose -f compose.prod.yml run --rm api node dist/src/scripts/seed-admin
+docker compose -f compose.prod.yml run --rm -e SEED_SAMPLE_PROJECTS=false api node dist/src/scripts/seed-content
 ```
+
+En producción, `SEED_SAMPLE_PROJECTS` va siempre en `false`: los trabajos de ejemplo no son reales.
 
 ### 2. Configurar GitHub (una sola vez)
 
@@ -140,6 +156,7 @@ En **Settings → Secrets and variables → Actions**, dentro del environment `p
 | Secret   | `VPS_SSH_KEY`        | Clave privada SSH del usuario de deploy                 |
 | Secret   | `VPS_PORT`           | Puerto SSH (opcional, por defecto 22)                   |
 | Variable | `TURNSTILE_SITE_KEY` | Site key real de Turnstile (pública, va en el admin)    |
+| Variable | `WHATSAPP_FALLBACK`  | WhatsApp para la página de error si la API no responde  |
 | Variable | `VPS_APP_DIR`        | Directorio de la app (opcional, por defecto `~/tamila`) |
 
 Los secretos de la aplicación (JWT, base de datos, Turnstile secret) viven solo en el `.env` de la VPS, nunca en el repositorio ni en GitHub.
