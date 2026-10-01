@@ -66,25 +66,29 @@ model SiteSettings {
 
 /// Imagen subida con sus variantes responsive (AVIF/WebP en varios anchos).
 model MediaAsset {
-  id            String         @id @default(uuid())
+  id              String         @id @default(uuid())
   /// Hash del contenido original: evita duplicados y da nombres de archivo inmutables.
-  hash          String         @unique
-  path          String
-  alt           String
-  width         Int
-  height        Int
+  hash            String         @unique
+  path            String
+  alt             String
+  width           Int
+  height          Int
   /// [{ width, avif, webp }] con rutas públicas bajo /media.
-  variants      Json
+  variants        Json
   /// Crédito de la foto (fotos de muestra de licencia libre).
-  credit        String?
-  createdAt     DateTime       @default(now())
-  siteOgImage   SiteSettings[] @relation("SiteOgImage")
-  siteHeroImage SiteSettings[] @relation("SiteHeroImage")
-  serviceCovers Service[]      @relation("ServiceCover")
-  serviceImages ServiceImage[]
-  projectBefore Project[]      @relation("ProjectBefore")
-  projectAfter  Project[]      @relation("ProjectAfter")
-  projectImages ProjectImage[]
+  credit          String?
+  /// Archivo original, relativo a MEDIA_ORIGINALS_DIR (privado). Null si no se guardó.
+  originalPath    String?
+  /// Versión de la codificación de las variantes (MEDIA_ENCODING_VERSION al generarlas).
+  encodingVersion Int            @default(1)
+  createdAt       DateTime       @default(now())
+  siteOgImage     SiteSettings[] @relation("SiteOgImage")
+  siteHeroImage   SiteSettings[] @relation("SiteHeroImage")
+  serviceCovers   Service[]      @relation("ServiceCover")
+  serviceImages   ServiceImage[]
+  projectBefore   Project[]      @relation("ProjectBefore")
+  projectAfter    Project[]      @relation("ProjectAfter")
+  projectImages   ProjectImage[]
 
   @@map("media_assets")
 }

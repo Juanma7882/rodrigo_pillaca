@@ -24,6 +24,8 @@ x-node: &node
     - pnpm_store:/pnpm/store
     # Imágenes del contenido (MEDIA_DIR=/data/media en la API).
     - media:/data/media
+    # Originales privados de las imágenes (MEDIA_ORIGINALS_DIR en la API).
+    - media-originals:/data/media-originals
 
 services:
   postgres:
@@ -62,6 +64,7 @@ services:
     environment:
       NODE_ENV: development
       MEDIA_DIR: /data/media
+      MEDIA_ORIGINALS_DIR: /data/media-originals
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
     ports:
       - '${API_PORT:-3000}:3000'
@@ -96,6 +99,7 @@ services:
 volumes:
   postgres-data:
   media:
+  media-originals:
   pnpm_store:
   node_modules:
   node_modules_api:

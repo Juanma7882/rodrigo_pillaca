@@ -14,6 +14,7 @@ const emptyToNull = (value: unknown) => (value === '' ? null : value);
 const seedEnvSchema = z.object({
   DATABASE_URL: z.string().min(1),
   MEDIA_DIR: z.string().min(1).default('./media'),
+  MEDIA_ORIGINALS_DIR: z.string().min(1).default('./media-originals'),
   SEED_WHATSAPP_NUMBER: z
     .string()
     .regex(/^\d*$/, 'SEED_WHATSAPP_NUMBER: solo dígitos, formato internacional sin +')
@@ -41,10 +42,15 @@ async function main() {
   const credits = await loadCredits();
 
   const image = async (file: string, alt: string) =>
-    storeImage(prisma, env.MEDIA_DIR, await readFile(resolve(SEED_MEDIA_DIR, file)), {
-      alt,
-      credit: credits.get(file) ?? null,
-    });
+    storeImage(
+      prisma,
+      { mediaDir: env.MEDIA_DIR, originalsDir: env.MEDIA_ORIGINALS_DIR },
+      await readFile(resolve(SEED_MEDIA_DIR, file)),
+      {
+        alt,
+        credit: credits.get(file) ?? null,
+      },
+    );
   const altOf = new Map(services.flatMap((s) => s.images.map((i) => [i.file, i.alt] as const)));
   const imageByFile = (file: string) => image(file, altOf.get(file) ?? '');
 

@@ -14,6 +14,7 @@
     "db:deploy": "prisma migrate deploy",
     "seed:admin": "node dist/src/scripts/seed-admin",
     "seed:content": "node dist/src/scripts/seed-content",
+    "media:reoptimize": "node dist/src/scripts/reoptimize-media",
     "generate": "prisma generate"
   },
   "dependencies": {

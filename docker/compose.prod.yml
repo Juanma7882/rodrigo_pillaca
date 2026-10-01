@@ -44,8 +44,11 @@ services:
     environment:
       <<: *db-env
       MEDIA_DIR: /data/media
+      MEDIA_ORIGINALS_DIR: /data/media-originals
     volumes:
       - media:/data/media
+      # Originales de las imágenes: privados, NUNCA montar en Caddy.
+      - media-originals:/data/media-originals
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -102,5 +105,6 @@ services:
 volumes:
   postgres-data:
   media:
+  media-originals:
   caddy-data:
   caddy-config:
