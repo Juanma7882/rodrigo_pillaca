@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
+import { AdminContentModule } from './admin-content/admin-content.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from './config/config.module';
 import { ENV, type Env } from './config/env';
@@ -36,6 +37,7 @@ import { PublicContentModule } from './public-content/public-content.module';
     AuthModule,
     MediaModule,
     PublicContentModule,
+    AdminContentModule,
   ],
 })
 export class AppModule {}
