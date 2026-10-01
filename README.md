@@ -89,6 +89,35 @@ pnpm db:deploy     # aplica migraciones pendientes
 - **Commits:** Conventional Commits (`feat: …`, `fix: …`). Husky corre lint-staged y commitlint.
 - **Ramas:** `main` = producción, `develop` = desarrollo. Todo entra por PR con CI en verde.
 
+## API de administración
+
+El panel admin edita todo el contenido del sitio público con los endpoints de `/api/admin/*`. Todos piden el access token del admin (`Authorization: Bearer …`), responden con `Cache-Control: no-store` y están documentados en Swagger (`/api/docs`, solo en desarrollo). Los esquemas de entrada y salida están en `@tamila/shared` (`packages/shared/src/admin`).
+
+| Recurso       | Endpoints                                                             |
+| ------------- | --------------------------------------------------------------------- |
+| Configuración | `GET`/`PATCH /admin/settings`                                         |
+| Servicios     | `/admin/services`: listar, ver, crear, editar, borrar y `PUT order`   |
+| Trabajos      | `/admin/projects` (filtro `?serviceId=`): igual que servicios         |
+| Pasos         | `/admin/process-steps`: listar, crear, editar, borrar y `PUT order`   |
+| Preguntas     | `/admin/faqs`: listar, crear, editar, borrar y `PUT order`            |
+| Imágenes      | `/admin/media`: subir (multipart), listar, editar alt/crédito, borrar |
+
+- **Edición:** se edita por id; `PATCH` es parcial y las galerías (`imageIds`) se reemplazan completas. Para reordenar se manda la lista completa de ids en el orden deseado.
+- **Integridad:** no se puede borrar un servicio con trabajos ni una imagen en uso (409). El trabajo destacado tiene que ser del mismo servicio.
+- **Caché:** los cambios se ven en el sitio en hasta 60 s (la caché de web).
+
+### Imágenes
+
+- Se aceptan JPEG, PNG, WebP y AVIF de hasta 10 MB, validados por el contenido del archivo. Las fotos HEIC del iPhone hay que exportarlas como JPEG.
+- Cada imagen se convierte a AVIF y WebP en 480, 960 y 1600 px, sin metadatos EXIF (ni ubicación GPS).
+- **Presupuesto de peso:** 40 / 120 / 250 KB para 480 / 960 / 1600 px. La calidad baja de a pasos hasta entrar. El tope se garantiza en AVIF, que es lo que descarga casi todo el mundo; la WebP de respaldo puede pasarse en fotos muy detalladas y queda avisado en el log.
+- **Originales:** se guardan en privado en `MEDIA_ORIGINALS_DIR`, que nunca se publica.
+- **Re-optimizar:** si cambian los topes o la codificación, se sube `MEDIA_ENCODING_VERSION` en `apps/api/src/media/media-processor.ts` y se corre `media:reoptimize`. Las variantes nuevas tienen otras URLs, así la caché inmutable de `/media` no sirve las viejas. Con `--force` regenera todo, aunque ya esté en la versión vigente.
+
+```bash
+docker compose --env-file .env -f docker/compose.dev.yml exec api pnpm --filter @tamila/api media:reoptimize
+```
+
 ## Despliegue (VPS)
 
 Cada push a `main` ejecuta `.github/workflows/deploy.yml`:
@@ -126,6 +155,7 @@ IMAGE_PREFIX=ghcr.io/juanma7882/rodrigo_pillaca IMAGE_TAG=<sha-anterior> docker 
 | `LOG_LEVEL`                                                                                                 | `info`                                                                         |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD`                                                                             | Administrador inicial (solo para el seed)                                      |
 | `MEDIA_DIR`                                                                                                 | No hace falta: compose lo fija en `/data/media` (volumen persistente)          |
+| `MEDIA_ORIGINALS_DIR`                                                                                       | No hace falta: compose lo fija en `/data/media-originals` (volumen privado)    |
 | `PUBLIC_SITE_URL`                                                                                           | `https://<SITE_DOMAIN>` (canonical, Open Graph y sitemap)                      |
 | `SEED_WHATSAPP_NUMBER`, `SEED_INSTAGRAM_URL`, `SEED_FACEBOOK_URL`, `SEED_TIKTOK_URL`, `SEED_BUSINESS_HOURS` | Datos de contacto iniciales (formato de WhatsApp: internacional sin `+`)       |
 | `SEED_SAMPLE_PROJECTS`                                                                                      | `false`                                                                        |
@@ -144,6 +174,12 @@ docker compose -f compose.prod.yml run --rm -e SEED_SAMPLE_PROJECTS=false api no
 ```
 
 En producción, `SEED_SAMPLE_PROJECTS` va siempre en `false`: los trabajos de ejemplo no son reales.
+
+Si la base ya tenía imágenes de una versión anterior, después del seed de contenido (que registra los originales de las fotos de muestra) hay que pasarlas a la codificación vigente:
+
+```bash
+docker compose -f compose.prod.yml run --rm api node dist/src/scripts/reoptimize-media
+```
 
 ### 2. Configurar GitHub (una sola vez)
 
