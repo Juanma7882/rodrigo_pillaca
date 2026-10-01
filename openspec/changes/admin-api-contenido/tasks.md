@@ -46,4 +46,4 @@
 ## 8. Documentación y cierre
 
 - [x] 8.1 Documentar todos los endpoints en Swagger (body, respuestas y errores 400/401/404/409/413) y verificar que aparecen en `/api/docs` agrupados por recurso con el candado de Bearer
-- [ ] 8.2 Actualizar el README con la sección de la API de administración, el presupuesto de peso de las imágenes, `MEDIA_ORIGINALS_DIR` y el paso post-deploy (seed de contenido + `media:reoptimize`), y verificar que `pnpm lint`, `pnpm typecheck`, `pnpm test` y los e2e de API pasan en local y en CI
+- [x] 8.2 Actualizar el README con la sección de la API de administración, el presupuesto de peso de las imágenes, `MEDIA_ORIGINALS_DIR` y el paso post-deploy (seed de contenido + `media:reoptimize`), y verificar que `pnpm lint`, `pnpm typecheck`, `pnpm test` y los e2e de API pasan en local y en CI
