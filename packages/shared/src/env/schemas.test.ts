@@ -27,6 +27,27 @@ describe('envSchema', () => {
     );
   });
 
+  it('guarda los originales fuera de la carpeta pública por defecto', () => {
+    const env = parseEnv(envSchema, validEnv);
+    expect([env.MEDIA_DIR, env.MEDIA_ORIGINALS_DIR]).toEqual(['./media', './media-originals']);
+  });
+
+  it('no permite los originales dentro de MEDIA_DIR', () => {
+    for (const MEDIA_ORIGINALS_DIR of ['./media/originals', 'media', '/data/media/orig']) {
+      const MEDIA_DIR = MEDIA_ORIGINALS_DIR.startsWith('/') ? '/data/media/' : './media';
+      expect(() => parseEnv(envSchema, { ...validEnv, MEDIA_DIR, MEDIA_ORIGINALS_DIR })).toThrow(
+        /MEDIA_ORIGINALS_DIR/,
+      );
+    }
+    expect(() =>
+      parseEnv(envSchema, {
+        ...validEnv,
+        MEDIA_DIR: '/data/media',
+        MEDIA_ORIGINALS_DIR: '/data/media-originals',
+      }),
+    ).not.toThrow();
+  });
+
   it('rechaza un origen CORS que no es URL', () => {
     expect(() => parseEnv(envSchema, { ...validEnv, CORS_ORIGINS: 'no-url' })).toThrow(
       /CORS_ORIGINS/,

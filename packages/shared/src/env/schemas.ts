@@ -10,7 +10,15 @@ const csv = z
   )
   .pipe(z.array(z.url()).min(1));
 
-export const envSchema = z.object({
+const normalizePath = (path: string) => path.replace(/^\.\//, '').replace(/\/+$/, '');
+
+/** Los originales no pueden quedar dentro de MEDIA_DIR: todo lo que está ahí se publica. */
+const isInside = (child: string, parent: string) => {
+  const [c, p] = [normalizePath(child), normalizePath(parent)];
+  return c === p || c.startsWith(`${p}/`);
+};
+
+const baseEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   DATABASE_URL: z.url({ error: 'DATABASE_URL debe ser una URL de conexión válida' }),
@@ -25,7 +33,17 @@ export const envSchema = z.object({
   TURNSTILE_SECRET_KEY: z.string({ error: 'TURNSTILE_SECRET_KEY es obligatoria' }).min(1),
   /** Carpeta donde se guardan las imágenes (volumen persistente en Docker). */
   MEDIA_DIR: z.string().min(1).default('./media'),
+  /** Originales de las imágenes subidas (privados: para re-optimizar). Nunca bajo MEDIA_DIR. */
+  MEDIA_ORIGINALS_DIR: z.string().min(1).default('./media-originals'),
 });
+
+export const envSchema = baseEnvSchema.refine(
+  (env) => !isInside(env.MEDIA_ORIGINALS_DIR, env.MEDIA_DIR),
+  {
+    path: ['MEDIA_ORIGINALS_DIR'],
+    message: 'MEDIA_ORIGINALS_DIR no puede estar dentro de MEDIA_DIR (quedaría público)',
+  },
+);
 export type Env = z.infer<typeof envSchema>;
 
 export const seedEnvSchema = z.object({
