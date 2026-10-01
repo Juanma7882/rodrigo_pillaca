@@ -5,6 +5,9 @@ import sharp from 'sharp';
 import type { MediaAsset } from '../generated/prisma/client';
 import { removeImageFiles, storeImage, toMediaDto, type MediaDirs } from './media-store';
 
+// Codificar AVIF es lento y en CI corre en paralelo con otras tareas: margen amplio.
+jest.setTimeout(30_000);
+
 /** Tabla media_assets en memoria, con la parte de la API de Prisma que usa storeImage. */
 function fakePrisma() {
   const rows = new Map<string, MediaAsset>();

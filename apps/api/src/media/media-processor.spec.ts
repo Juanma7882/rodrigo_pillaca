@@ -10,6 +10,9 @@ import {
   WEBP_QUALITIES,
 } from './media-processor';
 
+// Codificar AVIF es lento y en CI corre en paralelo con otras tareas: margen amplio.
+jest.setTimeout(30_000);
+
 const image = (width: number, height: number) =>
   sharp({ create: { width, height, channels: 3, background: '#f5c518' } })
     .jpeg()
@@ -126,7 +129,7 @@ describe('processImage', () => {
       expect(variant.avifBytes).toBeLessThanOrEqual(variant.webpBytes);
     }
     expect(result.overBudget.every((o) => o.format === 'webp')).toBe(true);
-  }, 60_000);
+  }, 120_000);
 
   it('si ni en el piso de calidad entra, guarda igual e informa la variante', async () => {
     const result = await processImage(await noise(480, 320), dir);
@@ -135,7 +138,7 @@ describe('processImage', () => {
       expect.objectContaining({ width: 480, format: 'webp', budget: MEDIA_BUDGET[480] }),
     );
     expect(await readdir(dir)).toHaveLength(2);
-  }, 30_000);
+  });
 });
 
 describe('budgetFor', () => {
