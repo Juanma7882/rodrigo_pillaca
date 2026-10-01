@@ -64,7 +64,7 @@ Las relaciones de Prisma tienen `onDelete: Cascade/SetNull` pensadas para el see
 - Servicios y trabajos se compactan igual al borrar, para mantener un único criterio.
 
 ### D5. Imágenes
-- **Recepción:** `FileInterceptor('file', { storage: memoryStorage(), limits: { fileSize: 10 * 1024 * 1024, files: 1 } })`. El exceso de tamaño de multer (`LIMIT_FILE_SIZE`) se traduce a 413. Campos de texto (`alt`, `credit`) se validan con `ZodValidationPipe`.
+- **Recepción:** `FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024, files: 1 } })`: sin `storage` ni `dest`, multer guarda el archivo en memoria. No se importa `multer` (no es dependencia directa de la API). El exceso de tamaño de multer (`LIMIT_FILE_SIZE`) se traduce a 413. Campos de texto (`alt`, `credit`) se validan con `ZodValidationPipe`.
 - **Validación del formato:** `sharp(buffer).metadata()` y se acepta solo `format ∈ {jpeg, png, webp, heif(avif)}`; cualquier error de `sharp` → 400 "El archivo no es una imagen válida". No se confía en `mimetype` ni en la extensión. Se agrega `limitInputPixels` (≈ 40 MP) para evitar bombas de descompresión.
 - **Procesamiento:** se reutiliza `storeImage()`, con el encoder optimizado de D7. `sharp` ya descarta EXIF por defecto al re-codificar (solo se aplica `rotate()` según la orientación), así que la ubicación GPS no llega a las variantes. El original se guarda tal cual en el almacenamiento privado (D7).
 - **Duplicados:** `storeImage()` ya es idempotente por hash; se responde 201 en ambos casos (el cliente no necesita distinguirlos).
@@ -100,7 +100,7 @@ No se agrega invalidación: los cambios se ven en ≤ 60 s (caché de web) + `st
 - **[Los originales ocupan disco (hasta 10 MB c/u)]** → para un sitio con decenas o pocos cientos de fotos son unos GB como mucho; se borran junto con la imagen.
 - **[Imágenes del seed ya cargadas no tienen original]** → al volver a correr el seed se registra el original (mismo hash) y después `media:reoptimize` las pasa a la versión 2.
 - **[Fotos HEIC de iPhone]** → `sharp` precompilado no decodifica HEIC; Safari suele convertirlas a JPEG al elegirlas desde el navegador. Si llega una HEIC, responde 400 con un mensaje que sugiere exportarla como JPEG.
-- **[Archivos en memoria (memoryStorage) hasta 10 MB]** → aceptable con un único usuario y una imagen por solicitud.
+- **[Archivos en memoria hasta 10 MB]** → aceptable con un único usuario y una imagen por solicitud.
 - **[Borrado de archivos tras borrar la fila puede dejar huérfanos]** → impacto solo de disco; se puede agregar más adelante un script de limpieza que compare `MEDIA_DIR` con la tabla.
 - **[Sin control de concurrencia, dos pestañas pueden pisarse cambios]** → un solo administrador; `updatedAt` en las respuestas permite agregar control optimista después sin romper el contrato.
 - **[`PATCH` con `.strict()` rechaza campos de solo lectura que la UI reenvíe (`id`, `updatedAt`)]** → la UI debe mandar solo los campos editables; los esquemas compartidos lo dejan explícito.

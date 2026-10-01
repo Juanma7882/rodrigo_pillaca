@@ -34,6 +34,6 @@ Fuera de alcance: las pantallas del panel admin (change siguiente, `admin-gestio
 - `apps/api`: nuevo módulo `admin-content` (controladores por recurso + servicios) y endpoints de subida; cambios en `media/` (codificación con presupuesto, versión de codificación en los nombres de archivo, guardado de originales) y script `media:reoptimize`. Prisma: `MediaAsset` suma `originalPath` y `encodingVersion` (migración aditiva).
 - Configuración: nueva variable `MEDIA_ORIGINALS_DIR` y volumen `media-originals` montado solo en la API (nunca en Caddy).
 - `packages/shared`: esquemas `admin/*` (inputs de creación/edición, reordenamiento y respuestas).
-- Dependencias: `@types/multer` (dev) para tipar la subida; `multer` ya viene con `@nestjs/platform-express`.
+- Dependencias: ninguna nueva. La subida usa el `FileInterceptor` de `@nestjs/platform-express` (que trae `multer`) sin importar `multer` directamente: con pnpm no es una dependencia de la API y `node` no la resolvería en producción.
 - Infraestructura: el proxy (Caddy) debe permitir cuerpos de hasta el límite de subida definido (10 MB).
 - Tests e2e nuevos en `apps/api/test/`.

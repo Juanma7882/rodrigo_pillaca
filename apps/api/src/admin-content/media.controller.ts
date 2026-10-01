@@ -43,7 +43,6 @@ import {
   type MediaUploadInput,
   type Paginated,
 } from '@tamila/shared';
-import { memoryStorage } from 'multer';
 import { fieldError } from '../common/http-errors';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { AdminController, jsonOutput, jsonSchema } from './admin-endpoint.decorator';
@@ -51,8 +50,8 @@ import { AdminMediaService } from './media.service';
 
 export const MAX_UPLOAD_MB = 10;
 
+// Sin `storage` ni `dest`, multer guarda el archivo en memoria (file.buffer).
 const MulterInterceptor = FileInterceptor('file', {
-  storage: memoryStorage(),
   limits: { fileSize: MAX_UPLOAD_MB * 1024 * 1024, files: 1 },
 });
 
@@ -105,7 +104,7 @@ export class MediaController {
   @ApiBadRequestResponse({ description: 'Falta la imagen o el alt, o el formato no es válido' })
   @ApiPayloadTooLargeResponse({ description: `La imagen supera los ${MAX_UPLOAD_MB} MB` })
   upload(
-    @UploadedFile() file: Express.Multer.File | undefined,
+    @UploadedFile() file: { buffer: Buffer } | undefined,
     @Body(new ZodValidationPipe(mediaUploadSchema)) body: MediaUploadInput,
   ): Promise<AdminMedia> {
     if (!file) throw fieldError('file', 'Falta la imagen (campo "file")');
