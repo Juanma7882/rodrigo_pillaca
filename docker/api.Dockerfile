@@ -20,9 +20,10 @@ FROM node:24-bookworm-slim AS runtime
 RUN apt-get update \
   && apt-get install -y --no-install-recommends openssl ca-certificates \
   && rm -rf /var/lib/apt/lists/*
-ENV NODE_ENV=production MEDIA_DIR=/data/media
-# El volumen de imágenes hereda este dueño la primera vez que se monta.
-RUN mkdir -p /data/media && chown node:node /data/media
+ENV NODE_ENV=production MEDIA_DIR=/data/media MEDIA_ORIGINALS_DIR=/data/media-originals
+# Los volúmenes de imágenes y originales heredan este dueño la primera vez que se montan.
+RUN mkdir -p /data/media /data/media-originals \
+  && chown node:node /data/media /data/media-originals
 WORKDIR /app
 COPY --from=build --chown=node:node /out .
 USER node
