@@ -89,6 +89,16 @@ pnpm db:deploy     # aplica migraciones pendientes
 - **Commits:** Conventional Commits (`feat: …`, `fix: …`). Husky corre lint-staged y commitlint.
 - **Ramas:** `main` = producción, `develop` = desarrollo. Todo entra por PR con CI en verde.
 
+## Panel admin
+
+El panel (`apps/admin`) es donde TAMILA edita el sitio sin tocar código. Está pensado primero para el celular: abajo hay una barra con Inicio, Servicios, Trabajos, Imágenes y "Más" (Configuración, Cómo trabajamos, Preguntas frecuentes); en la compu, un menú lateral.
+
+- **Editar:** cada pantalla valida con las mismas reglas que la API y muestra los errores junto a cada campo. Si salís con cambios sin guardar, pregunta antes de descartarlos.
+- **Ordenar:** servicios, trabajos, pasos y preguntas se reordenan arrastrando desde el asa (con el dedo, el mouse o el teclado: Espacio, flechas y Espacio). El orden se guarda solo.
+- **Publicar:** el interruptor "Publicado" oculta o muestra algo en el sitio sin borrarlo.
+- **Fotos:** se suben desde la galería o la cámara, enteras, con su texto alternativo. Las muy grandes (más de 3200 px u 8 MB) se achican en el navegador antes de subir. Los formularios tienen un selector para elegir de la biblioteca o subir sin salir.
+- **Ver el sitio:** el link usa `VITE_PUBLIC_SITE_URL`; sin esa variable no se muestra. Los cambios se ven en el sitio en hasta un minuto.
+
 ## API de administración
 
 El panel admin edita todo el contenido del sitio público con los endpoints de `/api/admin/*`. Todos piden el access token del admin (`Authorization: Bearer …`), responden con `Cache-Control: no-store` y están documentados en Swagger (`/api/docs`, solo en desarrollo). Los esquemas de entrada y salida están en `@tamila/shared` (`packages/shared/src/admin`).
@@ -160,6 +170,7 @@ IMAGE_PREFIX=ghcr.io/juanma7882/rodrigo_pillaca IMAGE_TAG=<sha-anterior> docker 
 | `SEED_WHATSAPP_NUMBER`, `SEED_INSTAGRAM_URL`, `SEED_FACEBOOK_URL`, `SEED_TIKTOK_URL`, `SEED_BUSINESS_HOURS` | Datos de contacto iniciales (formato de WhatsApp: internacional sin `+`)       |
 | `SEED_SAMPLE_PROJECTS`                                                                                      | `false`                                                                        |
 | `VITE_WHATSAPP_FALLBACK`                                                                                    | No se usa en la VPS: va como variable de GitHub (`WHATSAPP_FALLBACK`)          |
+| `VITE_PUBLIC_SITE_URL`                                                                                      | No se usa en la VPS: va como variable de GitHub (`PUBLIC_SITE_URL`)            |
 | `SITE_DOMAIN`, `ADMIN_DOMAIN`                                                                               | Dominios reales, sin `http://` (p. ej. `tamila.com.ar`, `admin.tamila.com.ar`) |
 | `HTTP_PORT`, `HTTPS_PORT`                                                                                   | `80` y `443`                                                                   |
 | `API_PORT`, `WEB_PORT`, `ADMIN_PORT`, `POSTGRES_PORT`, `DATABASE_URL_TEST`, `API_INTERNAL_URL`              | Solo desarrollo: no hacen falta                                                |
@@ -193,6 +204,7 @@ En **Settings → Secrets and variables → Actions**, dentro del environment `p
 | Secret   | `VPS_PORT`           | Puerto SSH (opcional, por defecto 22)                   |
 | Variable | `TURNSTILE_SITE_KEY` | Site key real de Turnstile (pública, va en el admin)    |
 | Variable | `WHATSAPP_FALLBACK`  | WhatsApp para la página de error si la API no responde  |
+| Variable | `PUBLIC_SITE_URL`    | URL pública del sitio (link "Ver el sitio" del admin)   |
 | Variable | `VPS_APP_DIR`        | Directorio de la app (opcional, por defecto `~/tamila`) |
 
 Los secretos de la aplicación (JWT, base de datos, Turnstile secret) viven solo en el `.env` de la VPS, nunca en el repositorio ni en GitHub.
