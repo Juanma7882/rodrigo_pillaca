@@ -1,4 +1,4 @@
-import { ThemeProvider } from '@tamila/ui';
+import { ThemeProvider, Toaster } from '@tamila/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -14,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
+        <Toaster position="top-center" richColors={false} closeButton />
       </QueryClientProvider>
     </ThemeProvider>
   </StrictMode>,
