@@ -51,4 +51,4 @@
 
 - [x] 10.1 Organizar los flujos del admin en una suite serial que inicia sesión una sola vez y reutiliza la página (un `storageState` compartido no sirve: la API rota y detecta la reutilización del refresh token), con las pruebas de celular en la misma sesión vía `setViewportSize` (Pixel 7); verificar que la suite nueva hace un solo login
 - [x] 10.2 Escribir los flujos e2e: editar el WhatsApp y verlo en el sitio (restaurando el valor), crear, reordenar con teclado y borrar una pregunta, subir y borrar una foto, y en celular la barra inferior sin scroll horizontal y el inicio sin descargar el chunk de dnd-kit; verificar que pasan en CI
-- [ ] 10.3 Actualizar el README (uso del panel, `VITE_PUBLIC_SITE_URL` y la variable de GitHub `PUBLIC_SITE_URL`) y verificar que `pnpm lint`, `pnpm typecheck`, `pnpm test` y los e2e pasan en local y en CI
+- [x] 10.3 Actualizar el README (uso del panel, `VITE_PUBLIC_SITE_URL` y la variable de GitHub `PUBLIC_SITE_URL`) y verificar que `pnpm lint`, `pnpm typecheck`, `pnpm test` y los e2e pasan en local y en CI
