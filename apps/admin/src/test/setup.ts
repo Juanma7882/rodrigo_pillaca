@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { toast } from '@tamila/ui';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 
 Object.defineProperty(window, 'matchMedia', {
@@ -23,6 +23,9 @@ globalThis.ResizeObserver ??= class {
 // jsdom no implementa las URLs de objetos (vistas previas de las fotos elegidas).
 URL.createObjectURL = vi.fn(() => 'blob:vista-previa');
 URL.revokeObjectURL = vi.fn();
+
+// En CI las páginas (y los chunks diferidos, como el de dnd-kit) tardan más en aparecer.
+configure({ asyncUtilTimeout: 5_000 });
 
 afterEach(() => {
   cleanup();
