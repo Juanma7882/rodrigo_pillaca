@@ -8,6 +8,9 @@ RUN pnpm install --frozen-lockfile --filter "@tamila/admin..."
 # La site key de Turnstile es pública: se embebe en el build del admin.
 ARG VITE_TURNSTILE_SITE_KEY
 ENV VITE_TURNSTILE_SITE_KEY=${VITE_TURNSTILE_SITE_KEY}
+# URL pública del sitio para el link "Ver el sitio" del admin.
+ARG VITE_PUBLIC_SITE_URL
+ENV VITE_PUBLIC_SITE_URL=${VITE_PUBLIC_SITE_URL}
 RUN pnpm --filter @tamila/shared build && pnpm --filter @tamila/admin build
 
 FROM caddy:2-alpine

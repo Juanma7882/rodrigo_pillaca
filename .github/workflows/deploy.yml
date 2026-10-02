@@ -40,6 +40,7 @@ jobs:
           build-args: |
             VITE_TURNSTILE_SITE_KEY=${{ vars.TURNSTILE_SITE_KEY }}
             VITE_WHATSAPP_FALLBACK=${{ vars.WHATSAPP_FALLBACK }}
+            VITE_PUBLIC_SITE_URL=${{ vars.PUBLIC_SITE_URL }}
           cache-from: type=gha,scope=${{ matrix.image }}
           cache-to: type=gha,mode=max,scope=${{ matrix.image }}
 

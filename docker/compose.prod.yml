@@ -87,6 +87,7 @@ services:
       dockerfile: docker/caddy.Dockerfile
       args:
         VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY}
+        VITE_PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:-}
     restart: unless-stopped
     environment:
       SITE_DOMAIN: ${SITE_DOMAIN}
